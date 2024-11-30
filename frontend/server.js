@@ -20,7 +20,7 @@ app.get('/main', (req, res) => {
 
 // Handle 404s by redirecting to auth page
 app.use((req, res) => {
-    res.redirect('/auth');
+    res.status(404).sendFile(path.join(__dirname, 'public', '404.html'));
 });
 
 const port = process.env.PORT || 2048;
