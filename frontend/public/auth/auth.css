@@ -1,0 +1,171 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f0f4f8;
+    flex-direction: column;
+}
+
+.auth-container {
+    width: 350px;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    margin-top: 80px;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.logo-icon {
+    max-width: 180PX; /* Adjust logo size */
+    height: auto;
+}
+
+.login-heading {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    margin-bottom: 0.7rem;
+    color: #333;
+    text-align: center;
+    /* margin-left: 5px; */
+}
+
+.input-container {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.input-container .icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+
+.auth-container input[type="text"],
+.auth-container input[type="password"] {
+    width: 100%;
+    padding: 0.75rem;
+    padding-left: 2.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.auth-container input::placeholder {
+    color: #999;
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+    color: #6E9CDD;
+    margin-bottom: 1.5rem;
+}
+
+.auth-container button {
+    width: 100%;
+    padding: 0.75rem;
+    background-color: #6E9CDD;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.auth-container button:hover {
+    background-color: rgb(0, 68, 142);
+}
+
+.signup-container {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+}
+
+.signin-form, .signup-form {
+    display: block;
+}
+
+.signup-form {
+    display: none;
+}
+
+/* Error and Success Messages */
+.error-message {
+    background-color: #ffe6e6;
+    border: 1px solid #ff9999;
+    color: #cc0000;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.success-message {
+    background-color: #e6ffe6;
+    border: 1px solid #99ff99;
+    color: #006600;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Error Shake Animation */
+@keyframes errorShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.error-shake {
+    animation: errorShake 0.5s ease-in-out;
+}
+
+/* Input Error State */
+.input-container input.error {
+    border-color: #ff9999;
+}
+
+/* Hide error message by default */
+.error-message,
+.success-message {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+/* Show error message when it has content */
+.error-message:not(:empty),
+.success-message:not(:empty) {
+    display: block;
+    opacity: 1;
+}
