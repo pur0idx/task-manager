@@ -712,44 +712,39 @@ body {
     font-size: 14px;
 }
 
-/* Base Mobile Styles (< 768px) */
 @media screen and (max-width: 768px) {
-    /* App Layout */
+    /* Base Layout */
     #app {
         flex-direction: column;
     }
 
-    /* Sidebar */
+    /* Sidebar converted to top navigation */
     .sidebar {
-        flex-direction: column;
+        width: 100%;
+        min-height: auto;
         padding: 8px;
+        flex-direction: column;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .sidebar-header {
-        width: 100%;
-        text-align: center;
         padding: 8px 0;
-        border-bottom: 1px solid var(--border-color);
-        margin-bottom: 8px;
+        text-align: center;
     }
 
     .logo {
         max-width: 100px;
-        margin: 0 auto;
+        height: auto;
     }
 
-    .nav-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        padding: 4px 0;
-    }
-
+    /* Menu layout */
     .sidebar-menu {
-        margin: 0;
+        margin: 8px 0;
         display: flex;
+        justify-content: center;
         gap: 8px;
+        flex-wrap: wrap;
     }
 
     .menu-item {
@@ -759,110 +754,56 @@ body {
         font-size: 14px;
     }
 
-    .user-section {
-        padding: 0;
-        border: none;
-        margin-left: 8px;
-    }
-
-    #user-info {
-        display: none;
-    }
-
-    .logout-btn {
-        width: auto;
-        padding: 6px 12px;
-        margin: 0;
-        font-size: 14px;
-    }
-
     /* Main Content */
     .main-content {
         max-width: 100%;
-        padding: 12px;
+        padding: 12px 16px; /* Added horizontal padding */
     }
 
     /* Content Header */
     .content-header {
         margin-bottom: 16px;
-        position: relative;
-        padding-right: 100px;
-    }
-
-    .content-header h1 {
-        font-size: 18px;
-        margin: 0;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
     }
 
     .header-actions {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
         display: flex;
         gap: 8px;
+        width: 100%;
     }
 
     .primary-btn,
     .secondary-btn {
-        padding: 4px 8px;
-        font-size: 12px;
-        margin: 0;
+        flex: 1;
+        justify-content: center;
+        padding: 8px;
+        font-size: 13px;
     }
 
     /* Filters */
     .filters {
-        background: white;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 16px;
-    }
-
-    .search-bar {
-        position: relative;
-        margin-bottom: 12px;
-    }
-
-    .search-bar i {
-        position: absolute;
-        left: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #999;
-        font-size: 14px;
-        pointer-events: none;
-    }
-
-    .search-bar input {
-        width: 100%;
-        padding: 8px 8px 8px 32px;
-        font-size: 14px;
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
+        margin: 0 8px 16px 8px;
     }
 
     .filter-options {
-        display: flex;
         overflow-x: auto;
-        gap: 8px;
         padding-bottom: 4px;
         -webkit-overflow-scrolling: touch;
-    }
-
-    .filter-options::-webkit-scrollbar {
-        display: none;
+        gap: 8px;
     }
 
     .filter-options select {
         padding: 6px 8px;
         font-size: 13px;
         flex-shrink: 0;
+        min-width: auto;
     }
 
-    /* Tasks List */
+    /* Compact Task List */
     .tasks-list {
-        background: transparent;
-        box-shadow: none;
+        margin: 0;  /* Remove negative margins */
     }
 
     .tasks-list-header {
@@ -870,41 +811,31 @@ body {
     }
 
     .task-list-item {
-        background: white;
-        border-radius: 6px;
-        padding: 10px;
-        margin-bottom: 8px;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        grid-template-areas:
-            "title actions"
-            "org status";
-        gap: 6px;
-        align-items: center;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin: 0 8px; /* Add margins on the sides */
+        padding: 8px 12px;
+    }
+
+    .task-list-item:last-child {
+        border-bottom: none;
     }
 
     .task-title {
-        grid-area: title;
+        flex: 1;
         font-size: 14px;
         font-weight: 500;
-        padding-right: 8px;
-    }
-
-    .task-organization {
-        grid-area: org;
-        font-size: 12px;
-        color: #666;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .task-status {
-        grid-area: status;
         font-size: 11px;
         padding: 2px 8px;
+        white-space: nowrap;
     }
 
     .task-actions {
-        grid-area: actions;
         display: flex;
         gap: 4px;
     }
@@ -918,48 +849,37 @@ body {
         height: 14px;
     }
 
-    /* Organizations */
-    .org-grid {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 12px;
-        padding: 0;
-    }
-
-    .org-card {
+    /* .logout-btn {
+        width: auto;
+        padding: 4px 12px;
+        font-size: 12px;
         margin: 0;
+    } */
+
+    /* Hide less important info on mobile */
+    .task-organization,
+    .task-due-date {
+        display: none;
+    }
+}
+
+/* Additional mobile refinements */
+@media screen and (max-width: 480px) {
+    .task-list-item {
+        padding: 8px;
     }
 
-    /* Modal */
+    .filter-options {
+        display: flex;
+    }
+
     .modal-content {
-        width: 90%;
+        width: 95%;
         margin: 20px auto;
-        padding: 16px;
-        max-height: 90vh;
+        padding: 15px;
     }
 
     .form-row {
         flex-direction: column;
-        gap: 12px;
-    }
-}
-
-/* Tiny screens (<480px) */
-@media screen and (max-width: 480px) {
-    .header-actions {
-        position: static;
-        transform: none;
-        margin-top: 8px;
-    }
-
-    .content-header {
-        padding-right: 0;
-    }
-
-    .task-list-item {
-        grid-template-areas:
-            "title actions"
-            "org org"
-            "status status";
     }
 }
