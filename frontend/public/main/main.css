@@ -519,6 +519,10 @@ body {
     display: none;
 }
 
+.sidebar.collapsed .user-section {
+    display: none;
+}
+
 .logout-btn {
     width: 100%;
     padding: 10px;
@@ -959,26 +963,16 @@ body {
 
     /* Compact Task List */
     .tasks-list {
-        margin: 0 10px;
-    }
-
-    .task-list-item {
-        padding: 12px;
-        grid-template-columns: 1fr auto;
-        gap: 10px;
-        margin-bottom: 8px;
+        margin: 0;  /* Remove negative margins */
     }
 
     .tasks-list-header {
-        padding: 12px;
-        margin-bottom: 8px;
+        display: none;
     }
 
-    /* Main Content padding */
-    .main-content {
-        margin-left: 0 !important;
-        width: 100% !important;
-        padding: 15px 10px;
+    .task-list-item {
+        margin: 0 8px; /* Add margins on the sides */
+        padding: 8px 12px;
     }
 
     .task-list-item:last-child {
