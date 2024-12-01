@@ -313,6 +313,23 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.querySelector('[data-view="tasks"]').addEventListener('click', () => switchView('tasks'));
     document.querySelector('[data-view="organizations"]').addEventListener('click', () => switchView('organizations'));
 
+    // Add this new status filter code here
+    // Add this modified status filter code
+    document.querySelector('select[name="status"]').addEventListener('change', (e) => {
+        console.log('Status changed to:', e.target.value); // Debug log
+        const selectedStatus = e.target.value.toLowerCase();
+        const allTasks = document.querySelectorAll('.task-list-item');
+
+        allTasks.forEach(task => {
+            const taskStatus = task.querySelector('.task-status').textContent.toLowerCase();
+            console.log('Task status:', taskStatus); // Debug log
+            if (selectedStatus === 'all' || taskStatus === selectedStatus) {
+                task.style.display = '';
+            } else {
+                task.style.display = 'none';
+            }
+        });
+    });
 
     // Helper function for confirmation dialog
     const showConfirmDialog = (message) => {
@@ -329,7 +346,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         alert(message);
     };
 
-    
+
     //deleteTask
     const deleteTask = async (taskId) => {
         try {
