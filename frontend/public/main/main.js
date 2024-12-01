@@ -21,6 +21,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     let allTasks = [];
     let filteredTasks = [];
 
+    // Add this at the top level with other state variables
+    let organizations = []; // Store organizations data
+
     //check sidebar status
     const sidebarState = localStorage.getItem('sidebarCollapsed');
     if (sidebarState === 'true') {
@@ -153,6 +156,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                         ${org.name.charAt(0).toUpperCase()}
                     </div>
                     <h3 class="org-name">${org.name}</h3>
+                    ${org.members.find(m => m.user.username === user.username && m.role === 'admin') ? `
+                        <button class="manage-org-btn" data-org-id="${org._id}">
+                            <i class="fas fa-cog"></i>
+                            Manage
+                        </button>
+                    ` : ''}
                 </div>
                 
                 <p class="org-description">${org.description || 'No description provided'}</p>
@@ -175,25 +184,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                             <div class="member ${member.role}">
                                 <span class="member-initial">${member.user.username.charAt(0).toUpperCase()}</span>
                                 <span class="member-name">${member.user.username}</span>
-                                ${member.role === 'admin' ? '<span class="admin-badge">Admin</span>' : ''}
+                                <span class="member-role">${member.role}</span>
                             </div>
                         `).join('')}
                     </div>
-                </div>
-    
-                <div class="org-actions">
-                    ${org.members.find(m => m.role === 'admin' && m.user.username === user.username)
-                ? `
-                            <button class="manage-org-btn primary-btn">
-                                <i class="fas fa-cog"></i> Manage
-                            </button>
-                        `
-                : `
-                            <button class="leave-org-btn secondary-btn">
-                                <i class="fas fa-sign-out-alt"></i> Leave
-                            </button>
-                        `
-            }
                 </div>
             </div>
         `).join('');
@@ -202,7 +196,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Load initial data
     async function loadData() {
         try {
-            const [tasks, organizations] = await Promise.all([
+            const [tasks, orgs] = await Promise.all([
                 apiRequest('/api/tasks'),
                 apiRequest('/api/organizations')
             ]);
@@ -212,7 +206,8 @@ document.addEventListener('DOMContentLoaded', async function () {
                 filteredTasks = [...tasks];
                 renderTasks(filteredTasks);
             }
-            if (organizations) {
+            if (orgs) {
+                organizations = orgs; // Store organizations in the variable
                 renderOrganizations(organizations);
                 await populateOrganizationFilter();
             }
@@ -493,6 +488,14 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
             }
         }
+        const manageBtn = e.target.closest('.manage-org-btn');
+        if (manageBtn) {
+            const orgId = manageBtn.dataset.orgId;
+            const organization = organizations.find(org => org._id === orgId);
+            if (organization) {
+                showManageOrgModal(organization);
+            }
+        }
     });
 
     // Modal Event Listeners
@@ -569,4 +572,107 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Initialize
     switchView('tasks');
     loadData();
+
+    // Add this function to handle the manage modal
+    function showManageOrgModal(organization) {
+        const modal = document.getElementById('add-org-modal');
+        const form = modal.querySelector('form');
+        const titleEl = modal.querySelector('h2');
+        const submitBtn = modal.querySelector('button[type="submit"]');
+
+        // Update modal title and button text
+        titleEl.textContent = 'Manage Organization';
+        submitBtn.textContent = 'Update Organization';
+
+        // Create members management section
+        const membersSection = document.createElement('div');
+        membersSection.className = 'members-management';
+        membersSection.innerHTML = `
+            <h3>Current Members</h3>
+            <div class="current-members">
+                ${organization.members.map(member => `
+                    <div class="member-item" data-username="${member.user.username}">
+                        <span>${member.user.username}</span>
+                        <span class="member-role">${member.role}</span>
+                        ${member.role !== 'admin' ? `
+                            <button type="button" class="remove-member-btn" data-username="${member.user.username}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                `).join('')}
+            </div>
+            <div class="add-member-section">
+                <h3>Add New Member</h3>
+                <div class="add-member-input">
+                    <input type="text" id="new-member-input" placeholder="Enter username">
+                    <button type="button" id="add-member-btn">Add Member</button>
+                </div>
+            </div>
+        `;
+
+        // Replace or append the members section
+        const existingMembersSection = form.querySelector('.members-management');
+        if (existingMembersSection) {
+            existingMembersSection.replaceWith(membersSection);
+        } else {
+            form.appendChild(membersSection);
+        }
+
+        // Event listener for removing members
+        membersSection.addEventListener('click', async (e) => {
+            const removeBtn = e.target.closest('.remove-member-btn');
+            if (removeBtn) {
+                const username = removeBtn.dataset.username;
+                if (confirm(`Are you sure you want to remove ${username} from the organization?`)) {
+                    try {
+                        const response = await apiRequest(`/api/organizations/${organization._id}/members/${username}`, {
+                            method: 'DELETE'
+                        });
+                        if (response.success) {
+                            removeBtn.closest('.member-item').remove();
+                        }
+                    } catch (error) {
+                        alert('Error removing member');
+                    }
+                }
+            }
+        });
+
+        // Event listener for adding new members
+        const addMemberBtn = membersSection.querySelector('#add-member-btn');
+        const newMemberInput = membersSection.querySelector('#new-member-input');
+
+        addMemberBtn.addEventListener('click', async () => {
+            const username = newMemberInput.value.trim();
+            if (username) {
+                try {
+                    const response = await apiRequest(`/api/organizations/${organization._id}/members`, {
+                        method: 'POST',
+                        body: JSON.stringify({ username })
+                    });
+                    if (response.success) {
+                        // Add new member to the list
+                        const membersList = membersSection.querySelector('.current-members');
+                        const newMemberElement = document.createElement('div');
+                        newMemberElement.className = 'member-item';
+                        newMemberElement.innerHTML = `
+                            <span>${username}</span>
+                            <span class="member-role">member</span>
+                            <button type="button" class="remove-member-btn" data-username="${username}">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+                        membersList.appendChild(newMemberElement);
+                        newMemberInput.value = '';
+                    }
+                } catch (error) {
+                    alert('Error adding member');
+                }
+            }
+        });
+
+        // Show the modal
+        modal.style.display = 'block';
+    }
 });
