@@ -107,44 +107,72 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const headerHtml = `
             <div class="tasks-list-header">
-                <span>Title</span>
-                <span>Organization</span>
-                <span>Due Date</span>
-                <span>Status</span>
-                <span>Actions</span>
+                <div>Title</div>
+                <div>Organization</div>
+                <div>Due Date</div>
+                <div>Status</div>
+                <div>Actions</div>
             </div>
         `;
 
-        const tasksHtml = tasks.map(task => `
-            <div class="task-list-item" data-task-id="${task._id}">
-                <div class="task-title">${task.title}</div>
-                <div class="task-organization">
-                    ${task.organization ? task.organization.name : '—'}
+        const tasksHtml = tasks.map(task => {
+            // Format due date
+            let dueDateDisplay = '—';
+            if (task.dueDate) {
+                const dueDate = new Date(task.dueDate);
+                const options = { month: 'short', day: 'numeric', year: 'numeric' };
+                dueDateDisplay = dueDate.toLocaleDateString('en-US', options);
+            }
+
+            return `
+                <div class="task-list-item" data-task-id="${task._id}">
+                    <div class="task-title">${task.title}</div>
+                    <div class="task-organization">
+                        ${task.organization ? task.organization.name : '—'}
+                    </div>
+                    <div class="task-due-date ${getDueDateClass(task.dueDate)}">
+                        ${dueDateDisplay}
+                    </div>
+                    <div>
+                        <span class="task-status ${task.status.toLowerCase()}">${task.status}</span>
+                    </div>
+                    <div class="task-actions">
+                        <button class="task-action-btn" title="Edit">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                            </svg>
+                        </button>
+                        <button class="task-action-btn delete-task-btn" data-task-id="${task._id}" title="Delete">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
-                <div class="task-due-date">
-                    ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
-                </div>
-                <div>
-                    <span class="task-status ${task.status.toLowerCase()}">${task.status}</span>
-                </div>
-                <div class="task-actions">
-                    <button class="task-action-btn" title="Edit">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                    </button>
-                    <button class="task-action-btn delete-task-btn" data-task-id="${task._id}" title="Delete">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         tasksContainer.innerHTML = headerHtml + tasksHtml;
+    }
+
+    // Helper function to format date
+    function formatDate(date) {
+        return date.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric'
+        });
+    }
+
+    // Helper function to get due date class
+    function getDueDateClass(diffDays) {
+        if (diffDays < 0) return 'overdue';
+        if (diffDays === 0) return 'due-today';
+        if (diffDays === 1) return 'due-tomorrow';
+        if (diffDays <= 7) return 'due-soon';
+        return '';
     }
 
     // Render organizations
