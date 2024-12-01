@@ -573,28 +573,215 @@ document.addEventListener('DOMContentLoaded', async function () {
     switchView('tasks');
     loadData();
 
-    // Add this function to handle the manage modal
-    function showManageOrgModal(organization) {
-        const modal = document.getElementById('add-org-modal');
-        const form = modal.querySelector('form');
-        const titleEl = modal.querySelector('h2');
-        const submitBtn = modal.querySelector('button[type="submit"]');
+    // Create separate modals
+    function createModals() {
+        // Add Organization Modal
+        if (!document.getElementById('add-org-modal')) {
+            const addOrgModal = document.createElement('div');
+            addOrgModal.id = 'add-org-modal';
+            addOrgModal.className = 'modal';
+            addOrgModal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Create Organization</h2>
+                    <form id="add-org-form">
+                        <div class="form-group">
+                            <label for="new-org-name">Organization Name</label>
+                            <input type="text" id="new-org-name" name="org-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-org-description">Description</label>
+                            <textarea id="new-org-description" name="org-description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="new-org-members">Initial Members (comma-separated usernames)</label>
+                            <input type="text" id="new-org-members" name="org-members" placeholder="e.g., user1, user2">
+                            <small>Optional: Add initial members to your organization</small>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="primary-btn">Create Organization</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(addOrgModal);
+            
+            // Add close functionality
+            addOrgModal.addEventListener('click', (e) => {
+                if (e.target === addOrgModal) addOrgModal.style.display = 'none';
+            });
 
-        // Update modal title and button text
-        titleEl.textContent = 'Manage Organization';
-        submitBtn.textContent = 'Update Organization';
+            // Handle form submission for new organization
+            const addOrgForm = document.getElementById('add-org-form');
+            addOrgForm.onsubmit = async (e) => {
+                e.preventDefault();
+                try {
+                    const response = await apiRequest('/api/organizations', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            name: addOrgForm.querySelector('#new-org-name').value,
+                            description: addOrgForm.querySelector('#new-org-description').value,
+                            members: addOrgForm.querySelector('#new-org-members').value
+                                .split(',')
+                                .map(username => username.trim())
+                                .filter(username => username)
+                        })
+                    });
 
-        // Add delete button if it doesn't exist
-        let deleteBtn = form.querySelector('.delete-org-btn');
-        if (!deleteBtn) {
-            deleteBtn = document.createElement('button');
-            deleteBtn.type = 'button';
-            deleteBtn.className = 'delete-org-btn';
-            deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Organization';
-            form.appendChild(deleteBtn);
+                    if (response.success) {
+                        addOrgModal.style.display = 'none';
+                        addOrgForm.reset();
+                        await loadData();
+                    }
+                } catch (error) {
+                    console.error('Error creating organization:', error);
+                    alert('Error creating organization');
+                }
+            };
         }
 
+        // Manage Organization Modal
+        if (!document.getElementById('manage-org-modal')) {
+            const manageOrgModal = document.createElement('div');
+            manageOrgModal.id = 'manage-org-modal';
+            manageOrgModal.className = 'modal';
+            manageOrgModal.innerHTML = `
+                <div class="modal-content">
+                    <h2>Manage Organization</h2>
+                    <form id="manage-org-form">
+                        <div class="form-group">
+                            <label for="edit-org-name">Organization Name</label>
+                            <input type="text" id="edit-org-name" name="org-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-org-description">Description</label>
+                            <textarea id="edit-org-description" name="org-description"></textarea>
+                        </div>
+                        <div class="members-management">
+                            <h3>Members</h3>
+                            <div class="current-members"></div>
+                            <div class="add-member-section">
+                                <div class="add-member-input">
+                                    <input type="text" id="new-member-input" placeholder="Enter username">
+                                    <button type="button" id="add-member-btn" class="secondary-btn">Add Member</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="primary-btn">Update Organization</button>
+                            <button type="button" class="delete-org-btn">
+                                <i class="fas fa-trash"></i> Delete Organization
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            document.body.appendChild(manageOrgModal);
+            
+            // Add close functionality
+            manageOrgModal.addEventListener('click', (e) => {
+                if (e.target === manageOrgModal) manageOrgModal.style.display = 'none';
+            });
+        }
+    }
+
+    // Update the showManageOrgModal function
+    function showManageOrgModal(organization) {
+        createModals();
+        const modal = document.getElementById('manage-org-modal');
+        const form = document.getElementById('manage-org-form');
+        
+        // Fill in existing values
+        form.querySelector('#edit-org-name').value = organization.name;
+        form.querySelector('#edit-org-description').value = organization.description || '';
+
+        // Render current members
+        const membersContainer = form.querySelector('.current-members');
+        membersContainer.innerHTML = organization.members.map(member => `
+            <div class="member-item" data-username="${member.user.username}">
+                <span>${member.user.username}</span>
+                <span class="member-role">${member.role}</span>
+                ${member.role !== 'admin' ? `
+                    <button type="button" class="remove-member-btn" data-username="${member.user.username}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                ` : ''}
+            </div>
+        `).join('');
+
+        // Handle adding new members
+        const addMemberBtn = form.querySelector('#add-member-btn');
+        const newMemberInput = form.querySelector('#new-member-input');
+        
+        addMemberBtn.onclick = async () => {
+            const username = newMemberInput.value.trim();
+            if (username) {
+                try {
+                    const response = await apiRequest(`/api/organizations/${organization._id}/members`, {
+                        method: 'POST',
+                        body: JSON.stringify({ username })
+                    });
+                    if (response.success) {
+                        // Refresh the organization data
+                        await loadData();
+                        // Refresh the modal with updated data
+                        const updatedOrg = organizations.find(org => org._id === organization._id);
+                        if (updatedOrg) showManageOrgModal(updatedOrg);
+                        newMemberInput.value = '';
+                    }
+                } catch (error) {
+                    alert('Error adding member');
+                }
+            }
+        };
+
+        // Handle removing members
+        membersContainer.addEventListener('click', async (e) => {
+            const removeBtn = e.target.closest('.remove-member-btn');
+            if (removeBtn) {
+                const username = removeBtn.dataset.username;
+                if (confirm(`Are you sure you want to remove ${username} from the organization?`)) {
+                    try {
+                        const response = await apiRequest(`/api/organizations/${organization._id}/members/${username}`, {
+                            method: 'DELETE'
+                        });
+                        if (response.success) {
+                            // Refresh the organization data
+                            await loadData();
+                            // Refresh the modal with updated data
+                            const updatedOrg = organizations.find(org => org._id === organization._id);
+                            if (updatedOrg) showManageOrgModal(updatedOrg);
+                        }
+                    } catch (error) {
+                        alert('Error removing member');
+                    }
+                }
+            }
+        });
+
+        // Handle form submission for updates
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const response = await apiRequest(`/api/organizations/${organization._id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify({
+                        name: form.querySelector('#edit-org-name').value,
+                        description: form.querySelector('#edit-org-description').value
+                    })
+                });
+
+                if (response.success) {
+                    modal.style.display = 'none';
+                    await loadData();
+                }
+            } catch (error) {
+                console.error('Error updating organization:', error);
+                alert('Error updating organization');
+            }
+        };
+
         // Handle delete organization
+        const deleteBtn = form.querySelector('.delete-org-btn');
         deleteBtn.onclick = async () => {
             if (confirm('Are you sure you want to delete this organization? This action cannot be undone.')) {
                 try {
@@ -604,7 +791,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
                     if (response.success) {
                         modal.style.display = 'none';
-                        await loadData(); // Refresh the organizations list
+                        await loadData();
                     }
                 } catch (error) {
                     console.error('Error deleting organization:', error);
@@ -613,7 +800,15 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         };
 
-        // Show the modal
         modal.style.display = 'block';
     }
+
+    // Update the add organization button click handler
+    document.getElementById('add-org-btn').addEventListener('click', () => {
+        createModals();
+        const modal = document.getElementById('add-org-modal');
+        const form = document.getElementById('add-org-form');
+        form.reset();
+        modal.style.display = 'block';
+    });
 });

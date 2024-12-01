@@ -1126,41 +1126,52 @@ body {
 
 /* Member Management Styles */
 .members-management {
-    margin-top: 20px;
-    border-top: 1px solid var(--border-color);
+    margin-top: 25px;
     padding-top: 20px;
+    border-top: 1px solid var(--border-color);
 }
 
 .members-management h3 {
-    font-size: 14px;
-    margin-bottom: 10px;
-    color: #666;
+    font-size: 16px;
+    color: var(--text-color);
+    margin-bottom: 15px;
 }
 
 .current-members {
     max-height: 200px;
     overflow-y: auto;
     margin-bottom: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 5px;
 }
 
 .member-item {
     display: flex;
     align-items: center;
-    padding: 8px;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    margin-bottom: 8px;
+    padding: 10px;
     background: #f8f9fa;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    gap: 10px;
 }
 
-.member-item span {
+.member-item span:first-child {
     flex: 1;
 }
 
 .member-role {
-    color: #666;
+    background: var(--primary-color);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
     font-size: 12px;
-    margin-right: 10px;
+    min-width: 60px;
+    max-width: 80px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .remove-member-btn {
@@ -1170,62 +1181,95 @@ body {
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
+    font-size: 14px;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 28px;
 }
 
 .remove-member-btn:hover {
+    opacity: 1;
     background: #fee2e2;
 }
 
 .add-member-section {
-    margin-top: 20px;
+    margin-top: 15px;
 }
 
 .add-member-input {
     display: flex;
     gap: 10px;
+    margin-bottom: 20px;
 }
 
-.add-member-input input {
+#new-member-input {
     flex: 1;
-    padding: 8px;
+    padding: 8px 12px;
     border: 1px solid var(--border-color);
     border-radius: 4px;
+    font-size: 14px;
 }
 
 #add-member-btn {
-    background: var(--primary-color);
-    color: white;
-    border: none;
     padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
+    white-space: nowrap;
 }
 
-#add-member-btn:hover {
-    background: var(--dark-primary-color);
+/* Unified button styles for manage organization */
+#manage-org-form .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
 }
 
-/* Delete Organization Button */
-.delete-org-btn {
-    background-color: #dc3545;
-    color: white;
+#manage-org-form .button-group button {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 13px;
     border: none;
     border-radius: 4px;
-    padding: 6px 12px;
-    font-size: 13px;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    margin-top: 15px;
-    transition: background-color 0.2s ease;
-    align-self: flex-start;
+    transition: all 0.2s ease;
 }
 
-.delete-org-btn i {
-    font-size: 12px;
+/* Update button specific */
+#manage-org-form button[type="submit"] {
+    background-color: var(--primary-color);
+    color: white;
 }
 
-.delete-org-btn:hover {
+#manage-org-form button[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: var(--dark-primary-color);
+}
+
+/* Delete button specific */
+#manage-org-form .delete-org-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+#manage-org-form .delete-org-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     background-color: #bb2d3b;
+}
+
+/* Ensure icons are aligned */
+#manage-org-form .button-group button i {
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
