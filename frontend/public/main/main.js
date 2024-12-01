@@ -537,6 +537,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     orgSearchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase().trim();
         const orgCards = document.querySelectorAll('.org-card');
+        let visibleCount = 0;
 
         orgCards.forEach(card => {
             const orgName = card.querySelector('.org-name').textContent.toLowerCase();
@@ -549,13 +550,20 @@ document.addEventListener('DOMContentLoaded', async function () {
                             orgMembers.some(member => member.includes(searchTerm));
 
             card.style.display = matches ? '' : 'none';
+            if (matches) visibleCount++;
         });
 
-        // Optional: Update results count
-        const visibleOrgs = Array.from(orgCards).filter(card => card.style.display !== 'none');
-        const resultsCountSpan = document.createElement('span');
-        resultsCountSpan.textContent = `${visibleOrgs.length} organization${visibleOrgs.length !== 1 ? 's' : ''} found`;
-        resultsCountSpan.classList.add('search-results-count');
+        // Update results count with more detail
+        const resultsCountSpan = document.querySelector('.search-results-count') || document.createElement('span');
+        resultsCountSpan.className = 'search-results-count';
+        resultsCountSpan.textContent = searchTerm 
+            ? `Found ${visibleCount} organization${visibleCount !== 1 ? 's' : ''} matching "${searchTerm}"`
+            : `Showing all ${visibleCount} organization${visibleCount !== 1 ? 's' : ''}`;
+        
+        // Insert the counter after the search input if it doesn't exist
+        if (!document.querySelector('.search-results-count')) {
+            orgSearchContainer.appendChild(resultsCountSpan);
+        }
     });
 
     // Initialize
