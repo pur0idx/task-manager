@@ -691,3 +691,30 @@ body {
 .delete-task-btn:hover {
     color: #ef4444;
 }
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #f4f4f4;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 15px;
+}
+
+.search-bar i {
+    color: #888;
+    margin-right: 10px;
+}
+
+.search-bar input {
+    flex-grow: 1;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+}
+
+.search-results-count {
+    color: #666;
+    font-size: 14px;
+    margin-left: 10px;
+}

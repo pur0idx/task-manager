@@ -59,9 +59,14 @@
             <!-- Tasks View -->
             <div id="tasks-view" class="view">
                 <div class="filters">
-                    <div class="search-bar">
+                    <!-- <div class="search-bar">
                         <i class="fas fa-search"></i>
                         <input type="text" placeholder="Search tasks...">
+                    </div> -->
+                    <div class="search-bar">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search tasks by title, description, tags, or organization..." class="search-input">
+                        <span id="search-results-count" class="search-results-count"></span>
                     </div>
                     <div class="filter-options">
                         <select name="org-filter">
@@ -76,6 +81,9 @@
                             <option value="in progress">In Progress</option>
                             <option value="completed">Completed</option>
                         </select>
+                    </div>
+                    <div class="search-results">
+                        <span id="search-results-count"></span>
                     </div>
                 </div>
 

@@ -237,33 +237,44 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
+   
+    
     function applyFilters() {
         const orgFilter = document.querySelector('select[name="org-filter"]').value;
         const statusFilter = document.querySelector('select[name="status"]').value;
-        const searchInput = document.querySelector('.search-bar input').value.toLowerCase();
+        const searchInput = document.querySelector('.search-bar input').value.toLowerCase().trim();
         const tagFilter = document.querySelector('select[name="tag-filter"]').value;
-
+    
         filteredTasks = allTasks.filter(task => {
             // Organization filter
             const matchesOrg = !orgFilter ||
                 (task.organization && task.organization._id === orgFilter);
-
+    
             // Status filter
             const matchesStatus = statusFilter === 'all' ||
                 task.status.toLowerCase() === statusFilter.toLowerCase();
-
-            // Search filter
-            const matchesSearch = task.title.toLowerCase().includes(searchInput) ||
-                (task.description && task.description.toLowerCase().includes(searchInput));
-
+    
+            // Enhanced Search filter
+            const matchesSearch = !searchInput || 
+                task.title.toLowerCase().includes(searchInput) ||
+                (task.description && task.description.toLowerCase().includes(searchInput)) ||
+                (task.tags && task.tags.some(tag => tag.toLowerCase().includes(searchInput))) ||
+                (task.organization && task.organization.name.toLowerCase().includes(searchInput));
+    
             // Tag filter
             const matchesTag = !tagFilter ||
                 (task.tags && task.tags.includes(tagFilter));
-
+    
             return matchesOrg && matchesStatus && matchesSearch && matchesTag;
         });
-
+    
         renderTasks(filteredTasks);
+    
+        // Update results count
+        const resultsCount = document.getElementById('search-results-count');
+        if (resultsCount) {
+            resultsCount.textContent = `${filteredTasks.length} task${filteredTasks.length !== 1 ? 's' : ''} found`;
+        }
     }
 
     async function populateOrganizationDropdowns() {
@@ -368,6 +379,8 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
 
+    //To make the search more interactive, let's add a real-time search event listener:
+    document.querySelector('.search-bar input').addEventListener('input', applyFilters);
 
     // Event Listeners
     document.querySelector('[data-view="tasks"]').addEventListener('click', () => switchView('tasks'));
@@ -498,6 +511,39 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (e.target === addTaskModal) taskModal.hide();
         if (e.target === addOrgModal) orgModal.hide();
     });
+
+    // Organization search
+const orgSearchInput = document.createElement('input');
+orgSearchInput.type = 'text';
+orgSearchInput.placeholder = 'Search organizations...';
+orgSearchInput.classList.add('org-search-input');
+
+// Add this before the organizations container in the HTML
+document.getElementById('organizations-view').insertBefore(orgSearchInput, document.getElementById('organizations-container'));
+
+orgSearchInput.addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase().trim();
+    const orgCards = document.querySelectorAll('.org-card');
+
+    orgCards.forEach(card => {
+        const orgName = card.querySelector('.org-name').textContent.toLowerCase();
+        const orgDescription = card.querySelector('.org-description').textContent.toLowerCase();
+        const orgMembers = Array.from(card.querySelectorAll('.member-name'))
+            .map(member => member.textContent.toLowerCase());
+
+        const matches = orgName.includes(searchTerm) || 
+                        orgDescription.includes(searchTerm) || 
+                        orgMembers.some(member => member.includes(searchTerm));
+
+        card.style.display = matches ? '' : 'none';
+    });
+
+    // Optional: Update results count
+    const visibleOrgs = Array.from(orgCards).filter(card => card.style.display !== 'none');
+    const resultsCountSpan = document.createElement('span');
+    resultsCountSpan.textContent = `${visibleOrgs.length} organization${visibleOrgs.length !== 1 ? 's' : ''} found`;
+    resultsCountSpan.classList.add('search-results-count');
+});
 
     // Initialize
     switchView('tasks');
