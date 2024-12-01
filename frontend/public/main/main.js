@@ -88,8 +88,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const headerHtml = `
             <div class="tasks-list-header">
-                <span></span>
-                <span>Task</span>
+                <span>Title</span>
                 <span>Organization</span>
                 <span>Due Date</span>
                 <span>Status</span>
@@ -99,16 +98,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         const tasksHtml = tasks.map(task => `
             <div class="task-list-item" data-task-id="${task._id}">
-                <div class="task-checkbox ${task.status.toLowerCase() === 'completed' ? 'completed' : ''}"></div>
-                <div class="task-main-info">
-                    <h3 class="task-title">${task.title}</h3>
-                    ${task.description ? `<p class="task-description">${task.description}</p>` : ''}
-                    ${task.tags.length > 0 ? `
-                        <div class="task-tags">
-                            ${task.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                        </div>
-                    ` : ''}
-                </div>
+                <div class="task-title">${task.title}</div>
                 <div class="task-organization">
                     ${task.organization ? task.organization.name : '—'}
                 </div>
