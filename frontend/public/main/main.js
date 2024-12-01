@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
     // DOM Elements
     const app = document.getElementById('app');
     const loading = document.getElementById('loading');
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Render tasks
     function renderTasks(tasks) {
         tasksContainer.className = 'tasks-list';
-        
+
         const headerHtml = `
             <div class="tasks-list-header">
                 <span></span>
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <span>Actions</span>
             </div>
         `;
-    
+
         const tasksHtml = tasks.map(task => `
             <div class="task-list-item" data-task-id="${task._id}">
                 <div class="task-checkbox ${task.status.toLowerCase() === 'completed' ? 'completed' : ''}"></div>
@@ -128,7 +128,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 </div>
             </div>
         `).join('');
-    
+
         tasksContainer.innerHTML = headerHtml + tasksHtml;
     }
 
@@ -171,17 +171,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     
                 <div class="org-actions">
                     ${org.members.find(m => m.role === 'admin' && m.user.username === user.username)
-                        ? `
+                ? `
                             <button class="manage-org-btn primary-btn">
                                 <i class="fas fa-cog"></i> Manage
                             </button>
                         `
-                        : `
+                : `
                             <button class="leave-org-btn secondary-btn">
                                 <i class="fas fa-sign-out-alt"></i> Leave
                             </button>
                         `
-                    }
+            }
                 </div>
             </div>
         `).join('');
@@ -210,11 +210,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         try {
             const organizations = await apiRequest('/api/organizations/list');
             const orgDropdowns = document.querySelectorAll('select[name="organization"]');
-            
-            const options = organizations.map(org => 
+
+            const options = organizations.map(org =>
                 `<option value="${org._id}">${org.name}</option>`
             ).join('');
-    
+
             orgDropdowns.forEach(dropdown => {
                 dropdown.innerHTML = `
                     <option value="">Select Organization</option>
@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         async handleSubmit(event) {
             event.preventDefault();
             const form = event.target;
-            
+
             try {
                 const taskData = {
                     title: form.querySelector('[name="title"]').value.trim(),
@@ -252,17 +252,17 @@ document.addEventListener('DOMContentLoaded', async function() {
                         .filter(tag => tag), // Remove empty tags
                     status: form.querySelector('[name="status"]').value
                 };
-    
+
                 // Validate required fields
                 if (!taskData.title) {
                     throw new Error('Title is required');
                 }
-    
+
                 const response = await apiRequest('/api/tasks', {
                     method: 'POST',
                     body: JSON.stringify(taskData)
                 });
-    
+
                 if (response) {
                     await loadData();
                     taskModal.hide();
@@ -307,25 +307,76 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     };
 
-    
+
 
     // Event Listeners
     document.querySelector('[data-view="tasks"]').addEventListener('click', () => switchView('tasks'));
     document.querySelector('[data-view="organizations"]').addEventListener('click', () => switchView('organizations'));
 
+
+    // Helper function for confirmation dialog
+    const showConfirmDialog = (message) => {
+        return new Promise((resolve) => {
+            const result = window.confirm(message);
+            resolve(result);
+        });
+    };
+
+    // Helper function for notifications
+    const showNotification = (message, type = 'info') => {
+        // You can enhance this with a proper notification system
+        // For now, using alert
+        alert(message);
+    };
+
+    
+    //deleteTask
+    const deleteTask = async (taskId) => {
+        try {
+            const confirmed = await showConfirmDialog('Are you sure you want to delete this task?');
+            if (!confirmed) return;
+
+            const response = await apiRequest(`/api/tasks/${taskId}`, {
+                method: 'DELETE'
+            });
+
+            if (response) {
+                // Remove the task from DOM immediately for better UX
+                const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+                if (taskElement) {
+                    taskElement.remove();
+                }
+
+                // Show success message
+                showNotification('Task deleted successfully', 'success');
+
+                // Reload the tasks to ensure everything is in sync
+                await loadData();
+            }
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            showNotification('Error deleting task. Please try again.', 'error');
+        }
+    };
+
     // Task Actions
     tasksContainer.addEventListener('click', async (e) => {
+        //const deleteBtn = e.target.closest('.delete-task-btn');
+        // if (deleteBtn) {
+        //     const taskId = deleteBtn.dataset.taskId;
+        //     if (confirm('Are you sure you want to delete this task?')) {
+        //         try {
+        //             await apiRequest(`/api/tasks/${taskId}`, { method: 'DELETE' });
+        //             loadData();
+        //         } catch (error) {
+        //             alert('Error deleting task');
+        //         }
+        //     }
+        // }
         const deleteBtn = e.target.closest('.delete-task-btn');
         if (deleteBtn) {
             const taskId = deleteBtn.dataset.taskId;
-            if (confirm('Are you sure you want to delete this task?')) {
-                try {
-                    await apiRequest(`/api/tasks/${taskId}`, { method: 'DELETE' });
-                    loadData();
-                } catch (error) {
-                    alert('Error deleting task');
-                }
-            }
+            await deleteTask(taskId);
         }
     });
 
