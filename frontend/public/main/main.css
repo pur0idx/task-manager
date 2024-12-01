@@ -691,30 +691,23 @@ body {
 .delete-task-btn:hover {
     color: #ef4444;
 }
-
-.search-bar {
-    display: flex;
-    align-items: center;
-    background-color: #f4f4f4;
-    border-radius: 8px;
-    padding: 10px;
+.org-search-input {
+    position: relative;
     margin-bottom: 15px;
 }
 
-.search-bar i {
-    color: #888;
-    margin-right: 10px;
+.org-search-input i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
 }
 
-.search-bar input {
-    flex-grow: 1;
-    border: none;
-    background: transparent;
-    font-size: 16px;
-}
-
-.search-results-count {
-    color: #666;
+.org-search-input input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
     font-size: 14px;
-    margin-left: 10px;
 }
