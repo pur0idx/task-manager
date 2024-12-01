@@ -33,7 +33,7 @@ body {
 }
 
 .logo-icon {
-    max-width: 180PX; /* Adjust logo size */
+    max-width: 180px;
     height: auto;
 }
 
@@ -168,4 +168,88 @@ body {
 .success-message:not(:empty) {
     display: block;
     opacity: 1;
+}
+
+/* Mobile Responsive Design */
+@media screen and (max-width: 480px) {
+    .auth-container {
+        width: 90%;
+        max-width: 350px;
+        padding: 1.5rem;
+        margin-top: 40px;
+        margin: 20px;
+    }
+
+    .logo-icon {
+        max-width: 150px; /* Smaller logo for mobile */
+    }
+
+    .login-heading {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+    }
+
+    .input-container {
+        margin-bottom: 0.8rem;
+    }
+
+    .auth-container input[type="text"],
+    .auth-container input[type="password"] {
+        padding: 0.6rem;
+        padding-left: 2.2rem;
+        font-size: 0.9rem;
+    }
+
+    .remember-forgot {
+        flex-direction: column;
+        gap: 0.5rem;
+        align-items: flex-start;
+        font-size: 0.8rem;
+    }
+
+    .auth-container button {
+        padding: 0.6rem;
+        font-size: 0.9rem;
+    }
+
+    .signup-container {
+        font-size: 0.8rem;
+    }
+}
+
+/* Tablet Responsive Design */
+@media screen and (min-width: 481px) and (max-width: 768px) {
+    .auth-container {
+        width: 80%;
+        max-width: 400px;
+        margin: 40px 20px;
+    }
+
+    .logo-icon {
+        max-width: 160px;
+    }
+}
+
+/* Landscape Mode */
+@media screen and (max-height: 600px) and (orientation: landscape) {
+    .auth-container {
+        margin-top: 20px;
+        padding: 1rem;
+    }
+
+    .logo-container {
+        margin-bottom: 1rem;
+    }
+
+    .logo-icon {
+        max-width: 120px;
+    }
+
+    .input-container {
+        margin-bottom: 0.5rem;
+    }
+
+    .remember-forgot {
+        margin-bottom: 0.5rem;
+    }
 }
