@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     const BACKEND_URL = 'https://api.final-project.xyz';
 
+    //FilterOrg
+    let allTasks = [];
+    let filteredTasks = [];
+
     // Check JWT authentication
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -75,6 +79,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             document.querySelector('[data-view="organizations"]').classList.add('active');
         }
     }
+
+
 
     // Render tasks
     function renderTasks(tasks) {
@@ -195,15 +201,69 @@ document.addEventListener('DOMContentLoaded', async function () {
                 apiRequest('/api/organizations')
             ]);
 
-            if (tasks) renderTasks(tasks);
-            if (organizations) renderOrganizations(organizations);
-
+            if (tasks) {
+                allTasks = tasks;
+                filteredTasks = [...tasks];
+                renderTasks(filteredTasks);
+            }
+            if (organizations) {
+                renderOrganizations(organizations);
+                await populateOrganizationFilter();
+            }
             loading.style.display = 'none';
             app.style.display = 'flex';
         } catch (error) {
             console.error('Error loading data:', error);
             alert('Error loading data. Please try again.');
         }
+    }
+
+    //Dropdown org
+    async function populateOrganizationFilter() {
+        try {
+            const organizations = await apiRequest('/api/organizations/list');
+            const orgFilterSelect = document.querySelector('select[name="org-filter"]');
+
+            const options = organizations.map(org =>
+                `<option value="${org._id}">${org.name}</option>`
+            ).join('');
+
+            orgFilterSelect.innerHTML = `
+                <option value="">All Organizations</option>
+                ${options}
+            `;
+        } catch (error) {
+            console.error('Error loading organizations for filter:', error);
+        }
+    }
+
+    function applyFilters() {
+        const orgFilter = document.querySelector('select[name="org-filter"]').value;
+        const statusFilter = document.querySelector('select[name="status"]').value;
+        const searchInput = document.querySelector('.search-bar input').value.toLowerCase();
+        const tagFilter = document.querySelector('select[name="tag-filter"]').value;
+
+        filteredTasks = allTasks.filter(task => {
+            // Organization filter
+            const matchesOrg = !orgFilter ||
+                (task.organization && task.organization._id === orgFilter);
+
+            // Status filter
+            const matchesStatus = statusFilter === 'all' ||
+                task.status.toLowerCase() === statusFilter.toLowerCase();
+
+            // Search filter
+            const matchesSearch = task.title.toLowerCase().includes(searchInput) ||
+                (task.description && task.description.toLowerCase().includes(searchInput));
+
+            // Tag filter
+            const matchesTag = !tagFilter ||
+                (task.tags && task.tags.includes(tagFilter));
+
+            return matchesOrg && matchesStatus && matchesSearch && matchesTag;
+        });
+
+        renderTasks(filteredTasks);
     }
 
     async function populateOrganizationDropdowns() {
@@ -313,6 +373,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     document.querySelector('[data-view="tasks"]').addEventListener('click', () => switchView('tasks'));
     document.querySelector('[data-view="organizations"]').addEventListener('click', () => switchView('organizations'));
 
+    //Filter ORG
+    document.querySelector('select[name="org-filter"]').addEventListener('change', applyFilters);
+    
     // Add this new status filter code here
     // Add this modified status filter code
     document.querySelector('select[name="status"]').addEventListener('change', (e) => {
