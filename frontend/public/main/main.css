@@ -1204,3 +1204,28 @@ body {
 #add-member-btn:hover {
     background: var(--dark-primary-color);
 }
+
+/* Delete Organization Button */
+.delete-org-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 15px;
+    transition: background-color 0.2s ease;
+    align-self: flex-start;
+}
+
+.delete-org-btn i {
+    font-size: 12px;
+}
+
+.delete-org-btn:hover {
+    background-color: #bb2d3b;
+}

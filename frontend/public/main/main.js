@@ -584,93 +584,34 @@ document.addEventListener('DOMContentLoaded', async function () {
         titleEl.textContent = 'Manage Organization';
         submitBtn.textContent = 'Update Organization';
 
-        // Create members management section
-        const membersSection = document.createElement('div');
-        membersSection.className = 'members-management';
-        membersSection.innerHTML = `
-            <h3>Current Members</h3>
-            <div class="current-members">
-                ${organization.members.map(member => `
-                    <div class="member-item" data-username="${member.user.username}">
-                        <span>${member.user.username}</span>
-                        <span class="member-role">${member.role}</span>
-                        ${member.role !== 'admin' ? `
-                            <button type="button" class="remove-member-btn" data-username="${member.user.username}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        ` : ''}
-                    </div>
-                `).join('')}
-            </div>
-            <div class="add-member-section">
-                <h3>Add New Member</h3>
-                <div class="add-member-input">
-                    <input type="text" id="new-member-input" placeholder="Enter username">
-                    <button type="button" id="add-member-btn">Add Member</button>
-                </div>
-            </div>
-        `;
-
-        // Replace or append the members section
-        const existingMembersSection = form.querySelector('.members-management');
-        if (existingMembersSection) {
-            existingMembersSection.replaceWith(membersSection);
-        } else {
-            form.appendChild(membersSection);
+        // Add delete button if it doesn't exist
+        let deleteBtn = form.querySelector('.delete-org-btn');
+        if (!deleteBtn) {
+            deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'delete-org-btn';
+            deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Delete Organization';
+            form.appendChild(deleteBtn);
         }
 
-        // Event listener for removing members
-        membersSection.addEventListener('click', async (e) => {
-            const removeBtn = e.target.closest('.remove-member-btn');
-            if (removeBtn) {
-                const username = removeBtn.dataset.username;
-                if (confirm(`Are you sure you want to remove ${username} from the organization?`)) {
-                    try {
-                        const response = await apiRequest(`/api/organizations/${organization._id}/members/${username}`, {
-                            method: 'DELETE'
-                        });
-                        if (response.success) {
-                            removeBtn.closest('.member-item').remove();
-                        }
-                    } catch (error) {
-                        alert('Error removing member');
-                    }
-                }
-            }
-        });
-
-        // Event listener for adding new members
-        const addMemberBtn = membersSection.querySelector('#add-member-btn');
-        const newMemberInput = membersSection.querySelector('#new-member-input');
-
-        addMemberBtn.addEventListener('click', async () => {
-            const username = newMemberInput.value.trim();
-            if (username) {
+        // Handle delete organization
+        deleteBtn.onclick = async () => {
+            if (confirm('Are you sure you want to delete this organization? This action cannot be undone.')) {
                 try {
-                    const response = await apiRequest(`/api/organizations/${organization._id}/members`, {
-                        method: 'POST',
-                        body: JSON.stringify({ username })
+                    const response = await apiRequest(`/api/organizations/${organization._id}`, {
+                        method: 'DELETE'
                     });
+
                     if (response.success) {
-                        // Add new member to the list
-                        const membersList = membersSection.querySelector('.current-members');
-                        const newMemberElement = document.createElement('div');
-                        newMemberElement.className = 'member-item';
-                        newMemberElement.innerHTML = `
-                            <span>${username}</span>
-                            <span class="member-role">member</span>
-                            <button type="button" class="remove-member-btn" data-username="${username}">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        `;
-                        membersList.appendChild(newMemberElement);
-                        newMemberInput.value = '';
+                        modal.style.display = 'none';
+                        await loadData(); // Refresh the organizations list
                     }
                 } catch (error) {
-                    alert('Error adding member');
+                    console.error('Error deleting organization:', error);
+                    alert('Error deleting organization');
                 }
             }
-        });
+        };
 
         // Show the modal
         modal.style.display = 'block';
