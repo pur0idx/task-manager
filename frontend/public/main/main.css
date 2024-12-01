@@ -576,7 +576,7 @@ body {
     display: grid;
     grid-template-columns: 4fr 3fr 2fr 2fr 1fr;
     gap: 16px;
-    padding: 8px 24px;
+    padding: 16px 24px;
     background: #f9fafb;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
