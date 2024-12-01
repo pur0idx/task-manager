@@ -816,6 +816,7 @@ body {
     color: white;
 }
 
+/* Organization Search Input */
 .org-search-input {
     position: relative;
     margin-bottom: 15px;
@@ -829,6 +830,31 @@ body {
     color: #999;
 }
 
+.org-search-input input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Match the search bar styles */
+.search-bar,
+.org-search-input {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.search-bar i,
+.org-search-input i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.search-bar input,
 .org-search-input input {
     width: 100%;
     padding: 12px 12px 12px 40px;

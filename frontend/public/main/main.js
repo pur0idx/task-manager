@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-   
+
     
     function applyFilters() {
         const orgFilter = document.querySelector('select[name="org-filter"]').value;
@@ -519,37 +519,44 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     // Organization search
-const orgSearchInput = document.createElement('input');
-orgSearchInput.type = 'text';
-orgSearchInput.placeholder = 'Search organizations...';
-orgSearchInput.classList.add('org-search-input');
+    const orgSearchContainer = document.createElement('div');
+    orgSearchContainer.className = 'org-search-input';
 
-// Add this before the organizations container in the HTML
-document.getElementById('organizations-view').insertBefore(orgSearchInput, document.getElementById('organizations-container'));
+    const searchIcon = document.createElement('i');
+    searchIcon.className = 'fas fa-search';
+    orgSearchContainer.appendChild(searchIcon);
 
-orgSearchInput.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase().trim();
-    const orgCards = document.querySelectorAll('.org-card');
+    const orgSearchInput = document.createElement('input');
+    orgSearchInput.type = 'text';
+    orgSearchInput.placeholder = 'Search organizations...';
+    orgSearchContainer.appendChild(orgSearchInput);
 
-    orgCards.forEach(card => {
-        const orgName = card.querySelector('.org-name').textContent.toLowerCase();
-        const orgDescription = card.querySelector('.org-description').textContent.toLowerCase();
-        const orgMembers = Array.from(card.querySelectorAll('.member-name'))
-            .map(member => member.textContent.toLowerCase());
+    // Add this before the organizations container in the HTML
+    document.getElementById('organizations-view').insertBefore(orgSearchContainer, document.getElementById('organizations-container'));
 
-        const matches = orgName.includes(searchTerm) || 
-                        orgDescription.includes(searchTerm) || 
-                        orgMembers.some(member => member.includes(searchTerm));
+    orgSearchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        const orgCards = document.querySelectorAll('.org-card');
 
-        card.style.display = matches ? '' : 'none';
+        orgCards.forEach(card => {
+            const orgName = card.querySelector('.org-name').textContent.toLowerCase();
+            const orgDescription = card.querySelector('.org-description').textContent.toLowerCase();
+            const orgMembers = Array.from(card.querySelectorAll('.member-name'))
+                .map(member => member.textContent.toLowerCase());
+
+            const matches = orgName.includes(searchTerm) || 
+                            orgDescription.includes(searchTerm) || 
+                            orgMembers.some(member => member.includes(searchTerm));
+
+            card.style.display = matches ? '' : 'none';
+        });
+
+        // Optional: Update results count
+        const visibleOrgs = Array.from(orgCards).filter(card => card.style.display !== 'none');
+        const resultsCountSpan = document.createElement('span');
+        resultsCountSpan.textContent = `${visibleOrgs.length} organization${visibleOrgs.length !== 1 ? 's' : ''} found`;
+        resultsCountSpan.classList.add('search-results-count');
     });
-
-    // Optional: Update results count
-    const visibleOrgs = Array.from(orgCards).filter(card => card.style.display !== 'none');
-    const resultsCountSpan = document.createElement('span');
-    resultsCountSpan.textContent = `${visibleOrgs.length} organization${visibleOrgs.length !== 1 ? 's' : ''} found`;
-    resultsCountSpan.classList.add('search-results-count');
-});
 
     // Initialize
     switchView('tasks');
