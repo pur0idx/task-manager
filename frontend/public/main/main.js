@@ -11,12 +11,28 @@ document.addEventListener('DOMContentLoaded', async function () {
     const viewTitle = document.getElementById('view-title');
     const tasksView = document.getElementById('tasks-view');
     const organizationsView = document.getElementById('organizations-view');
+    const sidebar = document.querySelector('.sidebar');
+    const toggleBtn = document.querySelector('.toggle-sidebar-btn');
+    const mainContent = document.querySelector('.main-content');
 
     const BACKEND_URL = 'https://api.final-project.xyz';
 
     //FilterOrg
     let allTasks = [];
     let filteredTasks = [];
+
+    //check sidebar status
+    const sidebarState = localStorage.getItem('sidebarCollapsed');
+    if (sidebarState === 'true') {
+        sidebar.classList.add('collapsed');
+    }
+
+    // Toggle sidebar
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+        // Save state to localStorage
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+    });
 
     // Check JWT authentication
     const token = localStorage.getItem('token');
