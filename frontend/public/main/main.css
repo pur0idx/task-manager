@@ -675,15 +675,22 @@ body {
 }
 
 .delete-task-btn {
+    background: var(--light-primary-color);
+    border: none;
+    cursor: pointer;
     color: #9ca3af;
-    padding: 4px;
-    border-radius: 4px;
-    transition: color 0.2s;
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-weight: 600;
 }
 
 .delete-task-btn:hover {
-    color: #ef4444;
+    background: #ef4444;
+    color: white;
 }
+
 .org-search-input {
     position: relative;
     margin-bottom: 15px;
