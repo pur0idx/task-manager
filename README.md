@@ -1,4 +1,6 @@
-# TaskHub
-a collaborative task management platform that helps you organize personal tasks and coordinate shared activities with friends and teams. Stay productive together!
+<p align="center">
+  <img src="frontend/public/resource/logo/LOGO.png" alt="TaskHub Logo" width="300" />
+</p>
 
-![TaskHub](frontend/public/resource/logo/Dark-noBG.png)
+# TaskHub
+A collaborative task management platform that helps you organize personal tasks and coordinate shared activities with friends and teams. Stay productive together!
