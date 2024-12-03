@@ -70,14 +70,24 @@ document.addEventListener('DOMContentLoaded', async function () {
                 return null;
             }
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'API request failed');
+            // Add this block to handle non-JSON responses
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error(`Server returned unexpected content type: ${contentType}`);
             }
 
-            return await response.json();
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'API request failed');
+            }
+
+            return data;
         } catch (error) {
             console.error('API Error:', error);
+            if (error instanceof SyntaxError) {
+                throw new Error('Server returned invalid response format');
+            }
             throw error;
         }
     }
@@ -786,25 +796,31 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
 
-        // Handle form submission for updates
+        // Update the form submission handler
         form.onsubmit = async (e) => {
             e.preventDefault();
             try {
+                const updatedData = {
+                    name: form.querySelector('#edit-org-name').value,
+                    description: form.querySelector('#edit-org-description').value
+                };
+
+                // Add validation
+                if (!updatedData.name.trim()) {
+                    throw new Error('Organization name is required');
+                }
+
                 const response = await apiRequest(`/api/organizations/${organization._id}`, {
                     method: 'PUT',
-                    body: JSON.stringify({
-                        name: form.querySelector('#edit-org-name').value,
-                        description: form.querySelector('#edit-org-description').value
-                    })
+                    body: JSON.stringify(updatedData)
                 });
 
-                if (response.success) {
-                    modal.style.display = 'none';
-                    await loadData();
-                }
+                modal.style.display = 'none';
+                await loadData();
+                
             } catch (error) {
                 console.error('Error updating organization:', error);
-                alert('Error updating organization');
+                alert(error.message || 'Error updating organization');
             }
         };
 
