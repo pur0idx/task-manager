@@ -336,18 +336,18 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     }
 
-    // Task Modal Handlers
+    // Update the taskModal object to handle only task creation
     const taskModal = {
-        show(task = null) {
+        show() {
             const modal = document.getElementById('add-task-modal');
             const form = modal.querySelector('form');
             const modalTitle = modal.querySelector('h2');
-            const submitButton = form.querySelector('button[type="submit"]');  // Get submit button
+            const submitButton = form.querySelector('button[type="submit"]');
             
             // Reset form and set for creation mode
             form.reset();
             modalTitle.textContent = 'Add New Task';
-            submitButton.textContent = 'Create Task';  // Set button text for create mode
+            submitButton.textContent = 'Create Task';
             
             // Set the form submission handler for creating new task
             form.onsubmit = this.handleSubmit;
@@ -372,11 +372,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                     tags: form.querySelector('[name="tags"]').value
                         .split(',')
                         .map(tag => tag.trim())
-                        .filter(tag => tag), // Remove empty tags
+                        .filter(tag => tag),
                     status: form.querySelector('[name="status"]').value
                 };
 
-                // Validate required fields
                 if (!taskData.title) {
                     throw new Error('Title is required');
                 }
@@ -389,12 +388,74 @@ document.addEventListener('DOMContentLoaded', async function () {
                 if (response) {
                     await loadData();
                     taskModal.hide();
+                    showNotification('Task created successfully', 'success');
                 }
             } catch (error) {
-                alert(error.message || 'Error creating task');
+                console.error('Error creating task:', error);
+                showNotification(error.message || 'Error creating task', 'error');
             }
         }
     };
+
+    // Separate function for handling task updates
+    function showEditTaskModal(task) {
+        const modal = document.getElementById('add-task-modal');
+        const form = modal.querySelector('form');
+        const modalTitle = modal.querySelector('h2');
+        const submitButton = form.querySelector('button[type="submit"]');
+        
+        // Update modal title and button text
+        modalTitle.textContent = 'Edit Task';
+        submitButton.textContent = 'Update Task';
+        
+        // Fill in existing values
+        form.querySelector('[name="title"]').value = task.title;
+        form.querySelector('[name="description"]').value = task.description || '';
+        form.querySelector('[name="dueDate"]').value = task.dueDate ? task.dueDate.split('T')[0] : '';
+        form.querySelector('[name="organization"]').value = task.organization ? task.organization._id : '';
+        form.querySelector('[name="tags"]').value = task.tags ? task.tags.join(', ') : '';
+        form.querySelector('[name="status"]').value = task.status;
+
+        // Create a separate handler for task updates
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const updatedData = {
+                    title: form.querySelector('[name="title"]').value.trim(),
+                    description: form.querySelector('[name="description"]').value.trim(),
+                    dueDate: form.querySelector('[name="dueDate"]').value,
+                    organization: form.querySelector('[name="organization"]').value || null,
+                    tags: form.querySelector('[name="tags"]').value
+                        .split(',')
+                        .map(tag => tag.trim())
+                        .filter(tag => tag),
+                    status: form.querySelector('[name="status"]').value
+                };
+
+                if (!updatedData.title) {
+                    throw new Error('Title is required');
+                }
+
+                const response = await apiRequest(`/api/tasks/${task._id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response) {
+                    await loadData();
+                    modal.style.display = 'none';
+                    showNotification('Task updated successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error updating task:', error);
+                showNotification(error.message || 'Error updating task', 'error');
+            }
+        };
+
+        // Show the modal and populate organization dropdown
+        modal.style.display = 'block';
+        populateOrganizationDropdowns();
+    }
 
     // Organization Modal Handlers
     const orgModal = {
@@ -504,7 +565,10 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     };
 
-    // Task Actions
+    // Update the click handlers
+    document.querySelector('[data-action="new-task"]').addEventListener('click', () => taskModal.show());
+
+    // Update the task actions event listener
     tasksContainer.addEventListener('click', async (e) => {
         const deleteBtn = e.target.closest('.delete-task-btn');
         const editBtn = e.target.closest('.task-action-btn:not(.delete-task-btn)');
@@ -546,13 +610,17 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     // Modal Event Listeners
-    document.querySelector('[data-action="new-task"]').addEventListener('click', taskModal.show);
     document.querySelector('[data-action="new-organization"]').addEventListener('click', orgModal.show);
+    document.querySelector('[data-action="new-task"]').addEventListener('click', () => taskModal.show());
 
-    addTaskModal.querySelector('.cancel-btn').addEventListener('click', taskModal.hide);
+    // Update cancel buttons
+    addTaskModal.querySelector('.cancel-btn').addEventListener('click', () => {
+        addTaskModal.style.display = 'none';
+        addTaskModal.querySelector('form').reset();
+    });
     addOrgModal.querySelector('.cancel-btn').addEventListener('click', orgModal.hide);
 
-    addTaskModal.querySelector('form').addEventListener('submit', taskModal.handleSubmit);
+    // Only keep organization form submit listener
     addOrgModal.querySelector('form').addEventListener('submit', orgModal.handleSubmit);
 
     // Logout handler
@@ -867,65 +935,4 @@ document.addEventListener('DOMContentLoaded', async function () {
         form.reset();
         modal.style.display = 'block';
     });
-
-    // Add this function to handle task editing
-    function showEditTaskModal(task) {
-        const addTaskModal = document.getElementById('add-task-modal');
-        const form = addTaskModal.querySelector('form');
-        const modalTitle = addTaskModal.querySelector('h2');
-        const submitButton = form.querySelector('button[type="submit"]');  // Get submit button
-        
-        // Update modal title and button text
-        modalTitle.textContent = 'Edit Task';
-        submitButton.textContent = 'Update Task';  // Change button text for edit mode
-        
-        // Fill in existing values
-        form.querySelector('[name="title"]').value = task.title;
-        form.querySelector('[name="description"]').value = task.description || '';
-        form.querySelector('[name="dueDate"]').value = task.dueDate ? task.dueDate.split('T')[0] : '';
-        form.querySelector('[name="organization"]').value = task.organization ? task.organization._id : '';
-        form.querySelector('[name="tags"]').value = task.tags ? task.tags.join(', ') : '';
-        form.querySelector('[name="status"]').value = task.status;
-
-        // Update form submission handler for editing
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            try {
-                const updatedData = {
-                    title: form.querySelector('[name="title"]').value.trim(),
-                    description: form.querySelector('[name="description"]').value.trim(),
-                    dueDate: form.querySelector('[name="dueDate"]').value,
-                    organization: form.querySelector('[name="organization"]').value || null,
-                    tags: form.querySelector('[name="tags"]').value
-                        .split(',')
-                        .map(tag => tag.trim())
-                        .filter(tag => tag),
-                    status: form.querySelector('[name="status"]').value
-                };
-
-                // Validate required fields
-                if (!updatedData.title) {
-                    throw new Error('Title is required');
-                }
-
-                const response = await apiRequest(`/api/tasks/${task._id}`, {
-                    method: 'PUT',
-                    body: JSON.stringify(updatedData)
-                });
-
-                if (response) {
-                    await loadData();
-                    taskModal.hide();
-                    showNotification('Task updated successfully', 'success');
-                }
-            } catch (error) {
-                console.error('Error updating task:', error);
-                showNotification(error.message || 'Error updating task', 'error');
-            }
-        };
-
-        // Show the modal
-        addTaskModal.style.display = 'block';
-        populateOrganizationDropdowns();
-    }
 });
