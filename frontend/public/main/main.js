@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 <div>Title</div>
                 <div>Organization</div>
                 <div>Due Date</div>
+                <div>Tags</div>
                 <div>Status</div>
                 <div>Actions</div>
             </div>
