@@ -413,9 +413,9 @@ body {
 
 .task-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     justify-content: center;
-    margin-top: 15px;
+    margin-top: 12px;
 }
 
 .task-action-btn {
@@ -1480,17 +1480,11 @@ body {
 .tasks-list-header,
 .task-list-item {
     display: grid;
-    grid-template-columns: 
-        200px  /* Title */
-        150px
-        100px
-        100px
-        100px  /* Status */
-        100px; /* Actions */
+    grid-template-columns: 35% 15% 12.5% 12.5% 12.5% 12.5%;
     align-items: center;
     padding: 12px 20px;
     gap: 10px;
-    min-width: max-content;
+    width: 100%;
 }
 
 .tasks-list-header {
@@ -1530,14 +1524,9 @@ body {
 
     .tasks-list-header,
     .task-list-item {
-        grid-template-columns: 
-            150px  /* Title */
-            120px
-            80px
-            80px
-            80px  /* Status */
-            80px;  /* Actions */
+        grid-template-columns: 200px 120px 80px 80px 80px 80px;
         gap: 8px;
         padding: 12px 16px;
+        min-width: max-content;
     }
 }
