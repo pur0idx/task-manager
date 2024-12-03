@@ -28,6 +28,7 @@ body {
     margin-bottom: 24px;
     padding: 0 0 20px;
     border-bottom: 1px solid var(--border-color);
+    position: relative;
 }
 
 .header-left {
@@ -47,6 +48,7 @@ body {
     transition: background-color 0.2s;
     font-weight: 500;
     font-size: 14px;
+    z-index: 1;
 }
 
 .back-button:hover {
@@ -54,6 +56,9 @@ body {
 }
 
 .archive-header h1 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 20px;
     color: var(--text-color);
     margin: 0;
@@ -78,16 +83,16 @@ body {
 .task-item {
     display: grid;
     grid-template-columns: 
-        300px  /* Title */
-        150px  /* Due Date */
-        100px  /* Tags */
-        200px  /* Organization */
-        120px  /* Status */
-        100px; /* Actions */
+        25%    /* Title */
+        15%    /* Due Date */
+        15%    /* Tags */
+        20%    /* Organization */
+        12%    /* Status */
+        13%;   /* Actions - increased */
     align-items: center;
     padding: 12px 20px;
     gap: 10px;
-    min-width: max-content;
+    width: 100%;
 }
 
 .tasks-list-header {
@@ -230,14 +235,31 @@ body {
     .tasks-list-header,
     .task-item {
         grid-template-columns: 
-            250px  /* Title */
-            120px  /* Due Date */
+            140px  /* Title */
+            100px  /* Due Date */
             80px   /* Tags */
-            180px  /* Organization */
-            100px  /* Status */
-            80px;  /* Actions */
+            120px  /* Organization */
+            80px   /* Status */
+            80px;  /* Actions - increased */
+        min-width: max-content;
         gap: 8px;
         padding: 12px 16px;
+    }
+}
+
+/* Very small screens */
+@media screen and (max-width: 480px) {
+    .tasks-list-header,
+    .task-item {
+        grid-template-columns: 
+            110px  /* Title */
+            80px   /* Due Date */
+            60px   /* Tags */
+            100px  /* Organization */
+            70px   /* Status */
+            70px;  /* Actions - increased */
+        gap: 6px;
+        padding: 10px 12px;
     }
 }
 
@@ -246,4 +268,5 @@ body {
     height: 32px;
     width: auto;
     margin-left: auto;
+    z-index: 1;
 }
