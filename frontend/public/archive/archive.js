@@ -53,7 +53,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     function renderArchivedTasks(tasks) {
         const container = document.getElementById('archived-tasks-container');
         
-        // Filter for archived tasks only
         const archivedTasks = tasks.filter(task => task.archived === true);
         
         if (!archivedTasks.length) {
@@ -64,14 +63,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         const tasksHtml = archivedTasks.map(task => `
             <div class="task-item" data-task-id="${task._id}">
                 <div class="task-title">${task.title}</div>
-                <div class="task-org">${task.organization ? task.organization.name : '—'}</div>
                 <div class="task-due-date">${formatDate(task.dueDate)}</div>
-                <div class="task-status">${task.status}</div>
+                <div class="task-tags">${task.tags ? task.tags.join(', ') : '—'}</div>
+                <div class="task-org">${task.organization ? task.organization.name : '—'}</div>
+                <div class="task-status ${task.status.toLowerCase().replace(' ', '-')}">${task.status}</div>
                 <div class="task-actions">
-                    <button class="restore-btn" title="Restore Task" data-task-id="${task._id}">
+                    <button class="restore-btn" title="Restore Task">
                         <i class="fas fa-undo"></i>
                     </button>
-                    <button class="delete-btn" title="Delete Permanently" data-task-id="${task._id}">
+                    <button class="delete-btn" title="Delete Permanently">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
