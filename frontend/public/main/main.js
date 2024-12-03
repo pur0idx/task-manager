@@ -646,25 +646,28 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Organization Actions
     organizationsContainer.addEventListener('click', async (e) => {
-        const leaveBtn = e.target.closest('.leave-org-btn');
-        if (leaveBtn) {
-            const orgId = leaveBtn.dataset.orgId;
-            if (confirm('Are you sure you want to leave this organization?')) {
-                try {
-                    await apiRequest(`/api/organizations/${orgId}/leave`, { method: 'POST' });
-                    loadData();
-                } catch (error) {
-                    alert('Error leaving organization');
-                }
+        const orgCard = e.target.closest('.org-card');
+        if (orgCard) {
+            const orgId = orgCard.dataset.orgId;
+            console.log('Organization clicked:', orgId); // Debug log
+
+            // Switch to tasks view
+            switchView('tasks');
+            
+            // Set the organization filter dropdown
+            const orgFilter = document.querySelector('select[name="org-filter"]');
+            if (orgFilter) {
+                orgFilter.value = orgId;
             }
-        }
-        const manageBtn = e.target.closest('.manage-org-btn');
-        if (manageBtn) {
-            const orgId = manageBtn.dataset.orgId;
-            const organization = organizations.find(org => org._id === orgId);
-            if (organization) {
-                showManageOrgModal(organization);
-            }
+
+            // Filter tasks for this organization
+            filteredTasks = allTasks.filter(task => {
+                console.log('Checking task:', task.title, 'Organization:', task.organization?._id); // Debug log
+                return task.organization && task.organization._id === orgId;
+            });
+
+            console.log('Filtered tasks:', filteredTasks); // Debug log
+            renderTasks(filteredTasks);
         }
     });
 
@@ -1037,7 +1040,31 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     // Add event listener for the sort dropdown
-    document.querySelector('select[name="sort-by"]').addEventListener('change', applyFilters);
+    document.querySelector('select[name="sort-by"]').addEventListener('change', function() {
+        const sortOrder = this.value;
+        
+        // Immediate sort when dropdown changes
+        if (sortOrder === 'asc') {
+            // Sort earliest first
+            filteredTasks.sort((a, b) => {
+                if (!a.dueDate && !b.dueDate) return 0;
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            });
+        } else if (sortOrder === 'desc') {
+            // Sort latest first
+            filteredTasks.sort((a, b) => {
+                if (!a.dueDate && !b.dueDate) return 0;
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(b.dueDate) - new Date(a.dueDate);
+            });
+        }
+        
+        // Immediately render the sorted tasks
+        renderTasks(filteredTasks);
+    });
 
     // Add this function at the top level
     function sortTasks(tasks, sortOrder) {
@@ -1055,13 +1082,6 @@ document.addEventListener('DOMContentLoaded', async function () {
             }
         });
     }
-
-    // Update the event listener for the sort dropdown
-    document.querySelector('select[name="sort-by"]').addEventListener('change', (e) => {
-        const sortOrder = e.target.value;
-        filteredTasks = sortTasks([...allTasks], sortOrder);
-        renderTasks(filteredTasks);
-    });
 
     // Update the applyFilters function
     function applyFilters() {
@@ -1089,4 +1109,72 @@ document.addEventListener('DOMContentLoaded', async function () {
         // Update the UI
         renderTasks(filteredTasks);
     }
+
+    // Add this function to create and show organization tasks pane
+    function showOrganizationTasks(orgId, orgName) {
+        // Create organization tasks pane
+        const orgTasksPane = document.createElement('div');
+        orgTasksPane.className = 'org-tasks-pane modal';
+        
+        // Filter tasks for this organization
+        const orgTasks = allTasks.filter(task => task.organization && task.organization._id === orgId);
+        
+        // Create the content
+        orgTasksPane.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>${orgName} Tasks</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="tasks-list">
+                    <div class="tasks-list-header">
+                        <div>Title</div>
+                        <div>Due Date</div>
+                        <div>Tags</div>
+                        <div>Status</div>
+                    </div>
+                    ${orgTasks.map(task => `
+                        <div class="task-list-item">
+                            <div class="task-title">${task.title}</div>
+                            <div class="task-due-date ${getDueDateClass(task.dueDate)}">
+                                ${task.dueDate ? new Date(task.dueDate).toLocaleDateString() : '—'}
+                            </div>
+                            <div class="task-tags">
+                                ${task.tags ? task.tags.map(tag => `<span class="task-tag">${tag}</span>`).join('') : '—'}
+                            </div>
+                            <div>
+                                <span class="task-status ${task.status.toLowerCase()}">${task.status}</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        // Add to document
+        document.body.appendChild(orgTasksPane);
+
+        // Add close functionality
+        const closeBtn = orgTasksPane.querySelector('.close-btn');
+        closeBtn.onclick = () => {
+            orgTasksPane.remove();
+        };
+
+        // Close when clicking outside
+        orgTasksPane.onclick = (e) => {
+            if (e.target === orgTasksPane) {
+                orgTasksPane.remove();
+            }
+        };
+    }
+
+    // Update the organization card click handler
+    organizationsContainer.addEventListener('click', async (e) => {
+        const orgCard = e.target.closest('.org-card');
+        if (orgCard && !e.target.closest('.manage-org-btn')) {
+            const orgId = orgCard.dataset.orgId;
+            const orgName = orgCard.querySelector('.org-name').textContent;
+            showOrganizationTasks(orgId, orgName);
+        }
+    });
 });
