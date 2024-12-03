@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async function () {
     const BACKEND_URL = 'https://api.final-project.xyz';
     const token = localStorage.getItem('token');
+    const archivedTasksContainer = document.getElementById('archived-tasks-container');
     
     if (!token) {
         window.location.href = '/auth';
@@ -84,52 +85,78 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Load archived tasks
     async function loadArchivedTasks() {
         try {
-            // Use the regular tasks endpoint and filter on the client side
             const tasks = await apiRequest('/api/tasks');
-            renderArchivedTasks(tasks);
+            const archivedTasks = tasks.filter(task => task.archived === true);
+            renderArchivedTasks(archivedTasks);
         } catch (error) {
             console.error('Error loading archived tasks:', error);
             showNotification('Error loading archived tasks', 'error');
         }
     }
 
-    // Restore task function
-    async function restoreTask(taskId) {
-        try {
-            // Update the task to remove archived status
-            await apiRequest(`/api/tasks/${taskId}`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    archived: false
-                })
-            });
+    // Event listeners for restore and delete actions
+    archivedTasksContainer.addEventListener('click', async (e) => {
+        const restoreBtn = e.target.closest('.restore-btn');
+        const deleteBtn = e.target.closest('.delete-btn');
+        
+        if (restoreBtn) {
+            const taskItem = restoreBtn.closest('.task-item');
+            const taskId = taskItem.getAttribute('data-task-id');
             
-            showNotification('Task restored successfully', 'success');
-            await loadArchivedTasks(); // Refresh the list
-        } catch (error) {
-            console.error('Error restoring task:', error);
-            showNotification('Error restoring task', 'error');
-        }
-    }
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tasks/${taskId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ archived: false })
+                });
 
-    // Delete task permanently function
-    async function deleteTaskPermanently(taskId) {
-        try {
-            if (!confirm('Are you sure you want to permanently delete this task? This action cannot be undone.')) {
-                return;
+                if (response.ok) {
+                    showNotification('Task restored successfully', 'success');
+                    taskItem.remove();
+                    await loadArchivedTasks();
+                } else {
+                    throw new Error('Failed to restore task');
+                }
+            } catch (error) {
+                console.error('Error restoring task:', error);
+                showNotification('Error restoring task', 'error');
             }
-
-            await apiRequest(`/api/tasks/${taskId}`, {
-                method: 'DELETE'
-            });
-            
-            showNotification('Task deleted permanently', 'success');
-            await loadArchivedTasks(); // Refresh the list
-        } catch (error) {
-            console.error('Error deleting task:', error);
-            showNotification('Error deleting task', 'error');
         }
-    }
+        
+        if (deleteBtn) {
+            const taskItem = deleteBtn.closest('.task-item');
+            if (!taskItem) return;
+            
+            const taskId = taskItem.getAttribute('data-task-id');
+            console.log('Deleting task with ID:', taskId); // Debug log
+            
+            if (confirm('Are you sure you want to permanently delete this task?')) {
+                try {
+                    const response = await fetch(`${BACKEND_URL}/api/tasks/${taskId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        showNotification('Task deleted successfully', 'success');
+                        taskItem.remove();
+                        await loadArchivedTasks();
+                    } else {
+                        throw new Error('Failed to delete task');
+                    }
+                } catch (error) {
+                    console.error('Error deleting task:', error);
+                    showNotification('Error deleting task', 'error');
+                }
+            }
+        }
+    });
 
     // Show notification function
     function showNotification(message, type = 'info') {
@@ -145,20 +172,6 @@ document.addEventListener('DOMContentLoaded', async function () {
         }, 3000);
     }
 
-    // Event listeners for restore and delete actions
-    document.getElementById('archived-tasks-container').addEventListener('click', async (e) => {
-        const restoreBtn = e.target.closest('.restore-btn');
-        const deleteBtn = e.target.closest('.delete-btn');
-        
-        if (restoreBtn) {
-            const taskId = restoreBtn.dataset.taskId;
-            await restoreTask(taskId);
-        } else if (deleteBtn) {
-            const taskId = deleteBtn.dataset.taskId;
-            await deleteTaskPermanently(taskId);
-        }
-    });
-
-    // Load archived tasks on page load
+    // Initial load
     await loadArchivedTasks();
 });
