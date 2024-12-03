@@ -14,8 +14,8 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-    origin: "*",
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    origin: "https://final-project.xyz",
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
@@ -25,13 +25,6 @@ app.options('*', cors());
 
 // Middleware
 app.use(express.json());
-// app.use((req, res, next) => {
-//     res.header('Access-Control-Allow-Origin', 'https://final-project.xyz');
-//     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-//     res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//     res.header('Access-Control-Allow-Credentials', 'true');
-//     next();
-// });
 
 // JWT Authentication Middleware
 const authenticateJWT = async (req, res, next) => {
@@ -382,7 +375,7 @@ app.delete('/api/organizations/:id', authenticateJWT, async (req, res) => {
     }
 });
 
-// Add this endpoint for updating organizations
+// Update organization endpoint
 app.put('/api/organizations/:id', authenticateJWT, async (req, res) => {
     try {
         const { id } = req.params;
