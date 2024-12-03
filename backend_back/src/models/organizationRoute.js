@@ -1,11 +1,10 @@
-import express from 'express';
-import authenticateJWT from '../middlewares/authenticateJWT'
-import Organization from '../models/Organization'
-
+const express = require('express');
 const router = express.Router();
+const auth = require('../middleware/auth');
+const Organization = require('../models/Organization');
 
 // Route for a member to leave an organization
-router.patch('/api/organizations/:id/leave', authenticateJWT, async (req, res) => {
+router.patch('/api/organizations/:id/leave', auth, async (req, res) => {
     try {
         const organization = await Organization.findById(req.params.id);
         
@@ -36,4 +35,4 @@ router.patch('/api/organizations/:id/leave', authenticateJWT, async (req, res) =
     }
 });
 
-export default router
+module.exports = router; 

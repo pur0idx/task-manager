@@ -25,7 +25,6 @@ import deleteMemberFromOrganization from "./controllers/deleteMemberFromOrganiza
 
 import getTrashItems from "./controllers/getTrashItems.js";
 import router from "./routes/route.js";
-import logMiddleware from "./middlewares/logMiddleware.js";
 
 const port = process.env.PORT || 4096;
 
@@ -39,7 +38,6 @@ app.options("*", cors());
 
 // Middleware
 app.use(express.json());
-app.use(logMiddleware)
 app.use(router)
 
 

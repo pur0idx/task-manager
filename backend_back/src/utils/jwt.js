@@ -1,4 +1,4 @@
-import crypto from 'crypto'
+const crypto = require('crypto');
 
 // Base64URL encoding functions
 const base64URLEncode = (str) => {
@@ -99,4 +99,4 @@ const authenticateToken = async (req, res, next) => {
     }
 };
 
-export { jwtSign, jwtVerify, authenticateToken };
+module.exports = { jwtSign, jwtVerify, authenticateToken };

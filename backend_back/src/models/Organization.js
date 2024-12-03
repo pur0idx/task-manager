@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const organizationSchema = new mongoose.Schema({
     name: {
@@ -57,4 +57,4 @@ organizationSchema.pre('save', function(next) {
     next();
 });
 
-export default mongoose.model('Organization', organizationSchema);
+module.exports = mongoose.model('Organization', organizationSchema);

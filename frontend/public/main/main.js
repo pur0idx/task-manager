@@ -750,9 +750,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             if (confirm('Are you sure you want to leave this organization?')) {
                 try {
+                    // const response = await apiRequest(`/api/organizations/${orgId}/members/leave`, {
+                    //     method: 'PATCH'
+                    // });
                     const response = await apiRequest(`/api/organizations/${orgId}/members/leave`, {
-                        method: 'DELETE'
-                    });
+                        method: 'PATCH'
+                    });    
 
                     if (response) {
                         showNotification('Successfully left the organization', 'success');

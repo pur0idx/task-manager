@@ -1,10 +1,9 @@
-import express from 'express';
-import Task from '../models/Task'
-
-
+const express = require('express');
 const router = express.Router();
+const Task = require('./Task');
+const auth = require('../middleware/auth'); // Assuming you have auth middleware
 
-
+// Delete task route
 router.delete('/api/tasks/:id', auth, async (req, res) => {
     try {
         const task = await Task.findById(req.params.id);
@@ -68,4 +67,4 @@ router.patch('/api/tasks/:id/restore', auth, async (req, res) => {
     }
 });
 
-export default router;
+module.exports = router;
