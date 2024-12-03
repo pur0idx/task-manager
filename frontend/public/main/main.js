@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     </div>
                     <div class="stat">
                         <i class="fas fa-tasks"></i>
-                        <span>${org.tasks ? org.tasks.length : 0} Tasks</span>
+                        <span>${org.taskCount || 0} Tasks</span>
                     </div>
                 </div>
     

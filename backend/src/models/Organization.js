@@ -34,6 +34,17 @@ const organizationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+}, {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+// Add virtual field for tasks
+organizationSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'organization',
+    count: true // This makes it return only the count
 });
 
 // Update the updatedAt timestamp before saving
