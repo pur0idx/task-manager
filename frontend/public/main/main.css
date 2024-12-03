@@ -19,6 +19,15 @@
     --hover-background: #f5f5f5;
     --modal-background: white;
     --input-background: white;
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --border-color: #dddddd;
+    --card-bg: #ffffff;
+    --sidebar-bg: #f8f9fa;
+    --sidebar-text: #333333;
+    --sidebar-hover: #e9ecef;
 }
 
 /* Dark mode variables */
@@ -31,11 +40,20 @@
     --hover-background: #3d3d3d;
     --modal-background: #2d2d2d;
     --input-background: #2d2d2d;
+    --bg-primary: #1a237e;
+    --bg-secondary: #283593;
+    --text-primary: #ffffff;
+    --text-secondary: #e3f2fd;
+    --border-color: #3949ab;
+    --card-bg: #283593;
+    --sidebar-bg: #1a237e;
+    --sidebar-text: #ffffff;
+    --sidebar-hover: #3949ab;
 }
 
 body {
-    background-color: var(--background-color);
-    color: var(--text-color);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 /* Layout */
@@ -1675,4 +1693,7 @@ body {
     border-color: var(--border-color);
     transition: all 0.3s ease;
 }
+
+
+
 

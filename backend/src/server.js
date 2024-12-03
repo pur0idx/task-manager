@@ -9,6 +9,9 @@ const { jwtSign, jwtVerify, authenticateToken } = require('./utils/jwt');
 const User = require('./models/User');
 const Task = require('./models/Task');
 const Organization = require('./models/Organization');
+const signInController = require('./controllers/signIn');
+const signUpController = require('./controllers/signUp')
+
 
 const app = express();
 
@@ -53,68 +56,8 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch((error) => console.error('MongoDB connection error:', error));
 
 // Authentication Routes
-app.post('/api/signin', async (req, res) => {
-    const { username, password } = req.body;
-
-    try {
-        const user = await User.findOne({ username });
-        
-        if (!user || user.password !== password) {
-            return res.status(401).json({ 
-                success: false, 
-                message: 'Invalid username or password'
-            });
-        }
-
-        // Create JWT token
-        const token = await jwtSign({
-            id: user._id,
-            username: user.username,
-            exp: Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours expiration
-        }, process.env.JWT_SECRET);
-
-        res.json({ 
-            success: true, 
-            message: 'Login successful',
-            token,
-            user: { username: user.username }
-        });
-    } catch (error) {
-        console.error('Login error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Server error during signin'
-        });
-    }
-});
-
-app.post('/api/signup', async (req, res) => {
-    const { username, password } = req.body;
-    
-    try {
-        const existingUser = await User.findOne({ username });
-        if (existingUser) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Username already taken'
-            });
-        }
-
-        const newUser = new User({ username, password });
-        await newUser.save();
-        
-        res.status(201).json({ 
-            success: true, 
-            message: 'Account created successfully'
-        });
-    } catch (error) {
-        console.error('Signup error:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Server error during signup'
-        });
-    }
-});
+app.post('/api/signin', signInController);
+app.post('/api/signup', signUpController);
 
 // Task Routes
 app.get('/api/tasks', authenticateJWT, async (req, res) => {
@@ -581,6 +524,57 @@ app.patch('/api/tasks/:id/archive', authenticateJWT, async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: 'Error archiving task' 
+        });
+    }
+});
+// Leave organization (update to PATCH)
+app.patch('/api/organizations/:id/members/leave', authenticateJWT, async (req, res) => {
+    try {
+        const organization = await Organization.findById(req.params.id);
+        
+        if (!organization) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Organization not found' 
+            });
+        }
+
+        // Check if user is a member of the organization
+        const memberIndex = organization.members.findIndex(
+            member => member.user.toString() === req.user.id
+        );
+
+        if (memberIndex === -1) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'You are not a member of this organization' 
+            });
+        }
+
+        // Check if user is the last admin
+        const isAdmin = organization.members[memberIndex].role === 'admin';
+        const adminCount = organization.members.filter(m => m.role === 'admin').length;
+        
+        if (isAdmin && adminCount === 1) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Cannot leave organization: You are the last admin. Please assign another admin first.' 
+            });
+        }
+
+        // Remove the member
+        organization.members.splice(memberIndex, 1);
+        await organization.save();
+
+        res.json({ 
+            success: true, 
+            message: 'Successfully left the organization' 
+        });
+    } catch (error) {
+        console.error('Error leaving organization:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Server error' 
         });
     }
 });
