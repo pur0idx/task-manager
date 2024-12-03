@@ -1466,3 +1466,79 @@ body {
 .task-list-item {
     grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 0.5fr;
 }
+
+/* Task List Container */
+.tasks-list {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-background);
+}
+
+/* Common grid layout for both header and items */
+.tasks-list-header,
+.task-list-item {
+    display: grid;
+    grid-template-columns: 
+        2fr    /* Title */
+        1fr    /* Due Date */
+        1fr    /* Tags */
+        1.5fr  /* Organization */
+        1fr    /* Status */
+        0.5fr; /* Actions */
+    align-items: center;
+    padding: 12px 20px;
+    gap: 10px;
+    width: 100%; /* Use full width */
+}
+
+.tasks-list-header {
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 500;
+    background: var(--card-background);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.task-list-item {
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Column content styles */
+.task-list-item > div,
+.tasks-list-header > div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 0 8px;
+}
+
+/* Task title specific styles */
+.task-list-item > div:first-child {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 992px) {
+    .tasks-list-header,
+    .task-list-item {
+        grid-template-columns: 
+            2fr    /* Title */
+            1fr    /* Due Date */
+            1fr    /* Tags */
+            1fr    /* Status */
+            0.5fr; /* Actions */
+        gap: 8px;
+        padding: 12px 16px;
+    }
+
+    /* Hide organization column */
+    .tasks-list-header div:nth-child(4),
+    .task-list-item div:nth-child(4) {
+        display: none;
+    }
+}
