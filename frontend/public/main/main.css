@@ -600,15 +600,17 @@ body {
 }
 
 .org-icon {
-    width: 48px;
-    height: 48px;
+    aspect-ratio: 1;
+    width: 40px;
+    min-width: 40px;
+    flex: 0 0 40px;
     background: var(--primary-color);
-    border-radius: 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 600;
 }
 
@@ -1155,14 +1157,51 @@ body {
     gap: 6px;
     margin-left: auto;
     transition: background-color 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .manage-org-btn i {
     font-size: 12px;
 }
 
-.manage-org-btn:hover {
-    background-color: var(--dark-primary-color);
+/* Show only icon on smaller screens */
+@media screen and (max-width: 480px) {
+    .manage-org-btn {
+        padding: 6px;
+        width: 28px;
+        height: 28px;
+    }
+
+    .manage-org-btn span {
+        display: none;
+    }
+
+    .manage-org-btn i {
+        margin: 0 auto;
+    }
+}
+
+/* Adjust org card layout for very small screens */
+@media screen and (max-width: 350px) {
+    .org-header {
+        flex-wrap: nowrap;
+        gap: 8px;
+    }
+
+    .org-name {
+        font-size: 16px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .org-icon {
+        width: 32px;
+        min-width: 32px;
+        flex: 0 0 32px;
+        font-size: 14px;
+    }
 }
 
 /* Member Management Styles */
@@ -1537,5 +1576,18 @@ body {
 
 .header-actions .secondary-btn.active:hover {
     background-color: var(--dark-primary-color);
+}
+
+.archive-btn {
+    margin-left: 10px;
+}
+
+.archive-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.archive-btn:hover {
+    opacity: 0.9;
 }
 
