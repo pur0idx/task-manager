@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const toggleBtn = document.querySelector('.toggle-sidebar-btn');
     const mainContent = document.querySelector('.main-content');
 
-    const BACKEND_URL = 'https://api.final-project.xyz';
+    const BACKEND_URL = 'http://localhost:4096';
 
     //FilterOrg
     let allTasks = [];
@@ -1446,6 +1446,48 @@ document.addEventListener('DOMContentLoaded', function() {
         themeButton.onclick = function() {
             console.log('Button clicked');
         };
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const themeSwitch = document.getElementById('theme-switch');
+    const themeSwitchIcon = themeSwitch.querySelector('i');
+    const themeSwitchText = themeSwitch.querySelector('span');
+    
+    // Get the current theme from localStorage or default to 'light'
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateThemeButton(currentTheme);
+
+    themeSwitch.addEventListener('click', function() {
+        const root = document.documentElement;
+        const currentTheme = root.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        // Update CSS variables based on theme
+        if (newTheme === 'dark') {
+            root.style.setProperty('--primary-color', '#f89b29');
+            root.style.setProperty('--secondary-color', '#ff8a00');
+            root.style.setProperty('--dark-primary-color', '#e68a25');
+        } else {
+            root.style.setProperty('--primary-color', '#6E9CDD');
+            root.style.setProperty('--secondary-color', '#4A90E2');
+            root.style.setProperty('--dark-primary-color', '#5b84bd');
+        }
+
+        // Update theme attribute and save preference
+        root.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeButton(newTheme);
+    });
+
+    function updateThemeButton(theme) {
+        if (theme === 'dark') {
+            themeSwitchIcon.className = 'fas fa-sun';
+            themeSwitchText.textContent = 'Light Mode';
+        } else {
+            themeSwitchIcon.className = 'fas fa-moon';
+            themeSwitchText.textContent = 'Dark Mode';
+        }
     }
 });
 
