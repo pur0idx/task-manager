@@ -474,3 +474,54 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
         });
     }
 });
+
+// Move item to trash
+app.patch('/api/:type/:id/trash', authenticateToken, async (req, res) => {
+    try {
+        const { type, id } = req.params;
+        const Model = type === 'tasks' ? Task : Organization;
+        
+        const item = await Model.findByIdAndUpdate(id, {
+            isDeleted: true,
+            deletedAt: new Date()
+        }, { new: true });
+        
+        res.json({ success: true, item });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Restore item from trash
+app.patch('/api/:type/:id/restore', authenticateToken, async (req, res) => {
+    try {
+        const { type, id } = req.params;
+        const Model = type === 'tasks' ? Task : Organization;
+        
+        const item = await Model.findByIdAndUpdate(id, {
+            isDeleted: false,
+            deletedAt: null
+        }, { new: true });
+        
+        res.json({ success: true, item });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});
+
+// Get trash items
+app.get('/api/:type/trash', authenticateToken, async (req, res) => {
+    try {
+        const { type } = req.params;
+        const Model = type === 'tasks' ? Task : Organization;
+        
+        const items = await Model.find({
+            isDeleted: true,
+            createdBy: req.user.id
+        });
+        
+        res.json(items);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+});

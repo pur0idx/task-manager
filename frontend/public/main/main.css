@@ -1530,3 +1530,12 @@ body {
         min-width: max-content;
     }
 }
+.header-actions .secondary-btn.active {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.header-actions .secondary-btn.active:hover {
+    background-color: var(--dark-primary-color);
+}
+

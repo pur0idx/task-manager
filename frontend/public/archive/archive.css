@@ -1,0 +1,141 @@
+body {
+    margin: 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+    background-color: #f5f5f5;
+}
+
+.archive-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+.archive-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.back-button {
+    text-decoration: none;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    font-weight: 500;
+}
+
+.back-button:hover {
+    background-color: #eee;
+}
+
+.archived-items {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.archived-tasks h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+.task-item {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    padding: 16px;
+    border-bottom: 1px solid #eee;
+    align-items: center;
+    transition: background-color 0.2s;
+}
+
+.task-item:hover {
+    background-color: #f9fafb;
+}
+
+.task-title {
+    font-size: 1.1em;
+    color: #111;
+}
+
+.task-organization {
+    color: #666;
+}
+
+.task-due-date {
+    color: #666;
+}
+
+.task-status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.task-status.todo {
+    background-color: #FEF3C7;
+    color: #92400E;
+}
+
+.task-status.in-progress {
+    background-color: #DBEAFE;
+    color: #1E40AF;
+}
+
+.task-status.completed {
+    background-color: #D1FAE5;
+    color: #065F46;
+}
+
+.restore-btn {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.restore-btn:hover {
+    background-color: #45a049;
+}
+
+.restore-btn i {
+    font-size: 0.9em;
+}
+
+/* Matching main page header style */
+.archive-header h1 {
+    font-size: 24px;
+    color: #111;
+    margin: 0;
+}
+
+/* Add task list header */
+.tasks-list-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr auto;
+    padding: 12px 16px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 500;
+    color: #374151;
+}

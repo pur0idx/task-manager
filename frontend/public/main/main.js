@@ -1177,4 +1177,109 @@ document.addEventListener('DOMContentLoaded', async function () {
             showOrganizationTasks(orgId, orgName);
         }
     });
+
+    // Add archive function
+    async function archiveTask(taskId) {
+        try {
+            const response = await fetch(`/api/tasks/${taskId}/archive`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to archive task');
+
+            // Remove task from current view
+            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+            if (taskElement) {
+                taskElement.remove();
+            }
+
+            showNotification('Task archived successfully', 'success');
+        } catch (error) {
+            console.error('Error archiving task:', error);
+            showNotification('Failed to archive task', 'error');
+        }
+    }
+
+    // Modify the delete button click handler
+    document.addEventListener('click', async (e) => {
+        if (e.target.closest('.delete-task-btn')) {
+            const taskId = e.target.closest('.delete-task-btn').dataset.taskId;
+            
+            const confirmDelete = await showConfirmDialog(
+                'Archive Task',
+                'Do you want to archive this task? You can access archived tasks later.',
+                'Archive',
+                'Cancel'
+            );
+
+            if (confirmDelete) {
+                await archiveTask(taskId);
+            }
+        }
+    });
+
+    // Add function to load archived tasks
+    async function loadArchivedTasks() {
+        try {
+            const response = await fetch('/api/tasks/archived', {
+                headers: {
+                    'Authorization': `Bearer ${getToken()}`
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to fetch archived tasks');
+
+            const archivedTasks = await response.json();
+            renderTasks(archivedTasks);
+        } catch (error) {
+            console.error('Error loading archived tasks:', error);
+            showNotification('Failed to load archived tasks', 'error');
+        }
+    }
+
+    // Add a toggle button in the header to switch between active and archived tasks
+    const headerActions = document.querySelector('.header-actions');
+    const toggleButton = document.createElement('button');
+    toggleButton.className = 'secondary-btn';
+    toggleButton.innerHTML = '<i class="fas fa-archive"></i> Show Archived';
+    toggleButton.addEventListener('click', function() {
+        const isShowingArchived = this.classList.toggle('active');
+        if (isShowingArchived) {
+            this.innerHTML = '<i class="fas fa-tasks"></i> Show Active';
+            loadArchivedTasks();
+        } else {
+            this.innerHTML = '<i class="fas fa-archive"></i> Show Archived';
+            loadTasks();
+        }
+    });
+    headerActions.appendChild(toggleButton);
+
+    // Add this to your existing code
+    document.querySelector('.sidebar').addEventListener('click', function(e) {
+        const menuItem = e.target.closest('.menu-item');
+        if (menuItem) {
+            const icon = menuItem.querySelector('i');
+            if (icon && icon.classList.contains('fa-box-archive')) {
+                window.location.href = '/archive';
+            }
+        }
+    });
+
+    // Find the archive button in the sidebar
+    const archiveButton = document.querySelector('[data-view="archive"]');
+    
+    if (archiveButton) {
+        archiveButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('Archive button clicked'); // Debug log
+            // Direct navigation to archive page
+            window.location.href = '/archive';
+        });
+    } else {
+        console.error('Archive button not found'); // Debug log
+    }
 });

@@ -37,6 +37,10 @@
                     <i class="fas fa-building"></i>
                     <span class="menu-text">Organizations</span>
                 </button>
+                <button class="menu-item" onclick="window.location.href='/archive'">
+                    <i class="fas fa-box-archive"></i>
+                    <span class="menu-text">Archive</span>
+                </button>
             </div>
         
             <div class="user-section">
@@ -119,6 +123,20 @@
                  -->
                 <div id="organizations-container" class="org-grid">
                     <!-- Organizations will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Trash View -->
+            <div id="trash-view" class="view" style="display: none;">
+                <div class="trash-container">
+                    <div class="trash-section">
+                        <h3>Deleted Tasks</h3>
+                        <div id="deleted-tasks-container"></div>
+                    </div>
+                    <div class="trash-section">
+                        <h3>Deleted Organizations</h3>
+                        <div id="deleted-organizations-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -206,3 +224,6 @@
     <script src="/main/main.js"></script>
 </body>
 </html>
+
+
+
