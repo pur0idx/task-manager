@@ -432,13 +432,10 @@ app.put('/api/organizations/:id', authenticateJWT, async (req, res) => {
     }
 });
 
-// Add task update endpoint
-app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
+// Update task endpoint (already exists, just make sure it can handle archived status)
+app.put('/api/tasks/:id', authenticateJWT, async (req, res) => {
     try {
-        const { id } = req.params;
-        const updates = req.body;
-        
-        const task = await Task.findById(id);
+        const task = await Task.findById(req.params.id);
         
         if (!task) {
             return res.status(404).json({ 
@@ -457,9 +454,9 @@ app.put('/api/tasks/:id', authenticateToken, async (req, res) => {
 
         // Update the task
         const updatedTask = await Task.findByIdAndUpdate(
-            id,
+            req.params.id,
             { 
-                ...updates,
+                ...req.body,
                 updatedAt: new Date()
             },
             { new: true }
@@ -493,19 +490,41 @@ app.patch('/api/:type/:id/trash', authenticateToken, async (req, res) => {
 });
 
 // Restore item from trash
-app.patch('/api/:type/:id/restore', authenticateToken, async (req, res) => {
+app.patch('/api/tasks/:id/restore', authenticateJWT, async (req, res) => {
     try {
-        const { type, id } = req.params;
-        const Model = type === 'tasks' ? Task : Organization;
+        const task = await Task.findById(req.params.id);
         
-        const item = await Model.findByIdAndUpdate(id, {
-            isDeleted: false,
-            deletedAt: null
-        }, { new: true });
-        
-        res.json({ success: true, item });
+        if (!task) {
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Task not found' 
+            });
+        }
+
+        // Check if user owns the task
+        if (task.createdBy.toString() !== req.user.id) {
+            return res.status(403).json({ 
+                success: false, 
+                message: 'Not authorized to restore this task' 
+            });
+        }
+
+        const updatedTask = await Task.findByIdAndUpdate(
+            req.params.id,
+            { 
+                archived: false,
+                archivedAt: null
+            },
+            { new: true }
+        ).populate('organization', 'name');
+
+        res.json({ success: true, task: updatedTask });
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        console.error('Error restoring task:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error restoring task' 
+        });
     }
 });
 

@@ -102,26 +102,15 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (restoreBtn) {
             const taskItem = restoreBtn.closest('.task-item');
             const taskId = taskItem.getAttribute('data-task-id');
-            console.log('Restoring task with ID:', taskId); // Debug log
             
             try {
-                const response = await fetch(`${BACKEND_URL}/api/tasks/${taskId}/restore`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ archived: false })
+                const data = await apiRequest(`/api/tasks/${taskId}/restore`, {
+                    method: 'PATCH'
                 });
 
-                const data = await response.json();
-                console.log('Restore response:', data); // Debug log
-
-                if (response.ok && data.success) {
+                if (data.success) {
                     showNotification('Task restored successfully', 'success');
-                    // Remove from archive view
                     taskItem.remove();
-                    // Force reload both archive and main task lists
                     await loadArchivedTasks();
                     // Trigger a refresh of the main tasks view if possible
                     if (window.opener && !window.opener.closed) {
