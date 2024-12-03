@@ -20,4 +20,26 @@ router.delete('/api/tasks/:id', auth, async (req, res) => {
     }
 });
 
+// Archive a task
+router.patch('/tasks/:id/archive', authenticateToken, async (req, res) => {
+    try {
+        const task = await Task.findByIdAndUpdate(
+            req.params.id,
+            {
+                archived: true,
+                archivedAt: new Date()
+            },
+            { new: true }
+        );
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        res.json({ success: true, task });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+});
+
 module.exports = router;

@@ -634,7 +634,35 @@ document.addEventListener('DOMContentLoaded', async function () {
         
         if (deleteBtn) {
             const taskId = deleteBtn.dataset.taskId;
-            await deleteTask(taskId);
+            try {
+                const confirmed = await showConfirmDialog('Are you sure you want to archive this task?');
+                if (!confirmed) return;
+
+                const response = await apiRequest(`/api/tasks/${taskId}/archive`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        archived: true,
+                        archivedAt: new Date()
+                    })
+                });
+
+                if (response) {
+                    // Remove the task from DOM immediately for better UX
+                    const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+                    if (taskElement) {
+                        taskElement.remove();
+                    }
+
+                    // Show success message
+                    showNotification('Task archived successfully', 'success');
+
+                    // Reload the tasks to ensure everything is in sync
+                    await loadData();
+                }
+            } catch (error) {
+                console.error('Error archiving task:', error);
+                showNotification('Error archiving task. Please try again.', 'error');
+            }
         } else if (editBtn) {
             const taskId = editBtn.closest('.task-list-item').dataset.taskId;
             const task = allTasks.find(t => t._id === taskId);
