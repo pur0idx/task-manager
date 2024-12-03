@@ -1,3 +1,6 @@
+const User = require('../models/User')
+const { jwtSign } = require('../utils/jwt')
+
 const signInController = async (req, res) => {
     const { username, password } = req.body;
 

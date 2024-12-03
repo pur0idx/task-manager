@@ -17,7 +17,7 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-    origin: "https://final-project.xyz",
+    origin: "*",
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true

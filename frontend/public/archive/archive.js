@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function () {
-    const BACKEND_URL = 'https://api.final-project.xyz';
+    const BACKEND_URL = 'http://localhost:4096';
     const token = localStorage.getItem('token');
     const archivedTasksContainer = document.getElementById('archived-tasks-container');
     
