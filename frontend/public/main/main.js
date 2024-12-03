@@ -134,12 +134,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 const dueDate = new Date(task.dueDate);
                 const options = { month: 'short', day: 'numeric', year: 'numeric' };
                 dueDateDisplay = dueDate.toLocaleDateString('en-US', options);
-                
+
                 // Add relative time for better context
                 const today = new Date();
                 const diffTime = dueDate - today;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
+
                 if (diffDays < 0) {
                     dueDateTitle = `Overdue by ${Math.abs(diffDays)} days`;
                 } else if (diffDays === 0) {
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Helper function to get due date class
     function getDueDateClass(dueDate) {
         if (!dueDate) return '';
-        
+
         const today = new Date();
         const due = new Date(dueDate);
         const diffTime = due - today;
@@ -319,37 +319,37 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
 
-    
+
     function applyFilters() {
         const orgFilter = document.querySelector('select[name="org-filter"]').value;
         const statusFilter = document.querySelector('select[name="status"]').value;
         const searchInput = document.querySelector('.search-bar input').value.toLowerCase().trim();
         const tagFilter = document.querySelector('select[name="tag-filter"]').value;
         const sortOrder = document.querySelector('select[name="sort-by"]').value;
-    
+
         // First apply all filters
         filteredTasks = allTasks.filter(task => {
             const matchesOrg = !orgFilter ||
                 (task.organization && task.organization._id === orgFilter);
-    
+
             const matchesStatus = statusFilter === 'all' ||
                 task.status.toLowerCase() === statusFilter.toLowerCase();
-    
-            const matchesSearch = !searchInput || 
+
+            const matchesSearch = !searchInput ||
                 task.title.toLowerCase().includes(searchInput) ||
                 (task.description && task.description.toLowerCase().includes(searchInput)) ||
                 (task.tags && task.tags.some(tag => tag.toLowerCase().includes(searchInput))) ||
                 (task.organization && task.organization.name.toLowerCase().includes(searchInput));
-    
+
             const matchesTag = !tagFilter || (
-                task.tags && 
-                Array.isArray(task.tags) && 
+                task.tags &&
+                Array.isArray(task.tags) &&
                 task.tags.some(tag => tag.trim() === tagFilter.trim())
             );
-    
+
             return matchesOrg && matchesStatus && matchesSearch && matchesTag;
         });
-    
+
         // Then apply sorting if a sort order is selected
         if (sortOrder !== 'none') {
             filteredTasks.sort((a, b) => {
@@ -368,10 +368,10 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
             });
         }
-    
+
         // Update the UI
         renderTasks(filteredTasks);
-    
+
         // Update results count
         const resultsCount = document.getElementById('search-results-count');
         if (resultsCount) {
@@ -406,15 +406,15 @@ document.addEventListener('DOMContentLoaded', async function () {
             const form = modal.querySelector('form');
             const modalTitle = modal.querySelector('h2');
             const submitButton = form.querySelector('button[type="submit"]');
-            
+
             // Reset form and set for creation mode
             form.reset();
             modalTitle.textContent = 'Add New Task';
             submitButton.textContent = 'Create Task';
-            
+
             // Set the form submission handler for creating new task
             form.onsubmit = this.handleSubmit;
-            
+
             modal.style.display = 'block';
             populateOrganizationDropdowns();
         },
@@ -466,11 +466,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         const form = modal.querySelector('form');
         const modalTitle = modal.querySelector('h2');
         const submitButton = form.querySelector('button[type="submit"]');
-        
+
         // Update modal title and button text
         modalTitle.textContent = 'Edit Task';
         submitButton.textContent = 'Update Task';
-        
+
         // Fill in existing values
         form.querySelector('[name="title"]').value = task.title;
         form.querySelector('[name="description"]').value = task.description || '';
@@ -564,7 +564,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     //Filter ORG
     document.querySelector('select[name="org-filter"]').addEventListener('change', applyFilters);
-    
+
     // Add this new status filter code here
     // Add this modified status filter code
     document.querySelector('select[name="status"]').addEventListener('change', (e) => {
@@ -592,67 +592,74 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     // Helper function for notifications
-   // Add this notification function
-function showNotification(message, type = 'info') {
-    const container = document.getElementById('notification-container');
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    
-    container.appendChild(notification);
-    
-    // Remove notification after 3 seconds
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
+    // Add this notification function
+    function showNotification(message, type = 'info') {
+        const container = document.getElementById('notification-container');
+        const notification = document.createElement('div');
+        notification.className = `notification ${type}`;
+        notification.textContent = message;
 
-// Update your task action handlers to use notifications
-tasksContainer.addEventListener('click', async (e) => {
-    const deleteBtn = e.target.closest('.delete-task-btn');
-    
-    if (deleteBtn) {
-        const taskId = deleteBtn.dataset.taskId;
+        container.appendChild(notification);
+
+        // Remove notification after 3 seconds
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Update your task action handlers to use notifications
+    tasksContainer.addEventListener('click', async (e) => {
+        const deleteBtn = e.target.closest('.delete-task-btn');
+        const editBtn = e.target.closest('.task-action-btn:not(.delete-task-btn)');
+
+        if (deleteBtn) {
+            const taskId = deleteBtn.dataset.taskId;
+            try {
+                const confirmed = await showConfirmDialog('Are you sure you want to archive this task?');
+                if (!confirmed) return;
+
+                const response = await apiRequest(`/api/tasks/${taskId}/archive`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({
+                        archived: true,
+                        archivedAt: new Date()
+                    })
+                });
+
+                if (response) {
+                    showNotification('Task archived successfully', 'success');
+                    await loadData();
+                }
+            } catch (error) {
+                console.error('Error archiving task:', error);
+                showNotification('Error archiving task. Please try again.', 'error');
+            }
+        } else if (editBtn) {
+            const taskId = editBtn.closest('.task-list-item').dataset.taskId;
+            const task = allTasks.find(t => t._id === taskId);
+            if (task) {
+                showEditTaskModal(task);
+            }
+        }
+    });
+
+    // Add notifications for other actions
+    async function restoreTask(taskId) {
         try {
-            const confirmed = await showConfirmDialog('Are you sure you want to archive this task?');
-            if (!confirmed) return;
-
-            const response = await apiRequest(`/api/tasks/${taskId}/archive`, {
+            const response = await apiRequest(`/api/tasks/${taskId}/restore`, {
                 method: 'PATCH',
-                body: JSON.stringify({
-                    archived: true,
-                    archivedAt: new Date()
-                })
+                body: JSON.stringify({ archived: false })
             });
 
             if (response) {
-                showNotification('Task archived successfully', 'success');
-                await loadData();
+                showNotification('Task restored successfully', 'success');
+                await loadArchivedTasks();
             }
         } catch (error) {
-            console.error('Error archiving task:', error);
-            showNotification('Error archiving task. Please try again.', 'error');
+            console.error('Error restoring task:', error);
+            showNotification('Error restoring task. Please try again.', 'error');
         }
     }
-});
-
-// Add notifications for other actions
-async function restoreTask(taskId) {
-    try {
-        const response = await apiRequest(`/api/tasks/${taskId}/restore`, {
-            method: 'PATCH',
-            body: JSON.stringify({ archived: false })
-        });
-
-        if (response) {
-            showNotification('Task restored successfully', 'success');
-            await loadArchivedTasks();
-        }
-    } catch (error) {
-        console.error('Error restoring task:', error);
-        showNotification('Error restoring task. Please try again.', 'error');
-    }
-}
 
     //deleteTask
     const deleteTask = async (taskId) => {
@@ -690,7 +697,7 @@ async function restoreTask(taskId) {
     // tasksContainer.addEventListener('click', async (e) => {
     //     const deleteBtn = e.target.closest('.delete-task-btn');
     //     const editBtn = e.target.closest('.task-action-btn:not(.delete-task-btn)');
-        
+
     //     if (deleteBtn) {
     //         const taskId = deleteBtn.dataset.taskId;
     //         try {
@@ -736,11 +743,11 @@ async function restoreTask(taskId) {
         const leaveBtn = e.target.closest('.leave-org-btn');
         const manageBtn = e.target.closest('.manage-org-btn');
         const orgCard = e.target.closest('.org-card');
-        
+
         if (leaveBtn) {
             e.stopPropagation(); // Prevent card click
             const orgId = leaveBtn.dataset.orgId;
-            
+
             if (confirm('Are you sure you want to leave this organization?')) {
                 try {
                     const response = await apiRequest(`/api/organizations/${orgId}/members/leave`, {
@@ -768,7 +775,7 @@ async function restoreTask(taskId) {
             // Handle card click (show tasks)
             const orgId = orgCard.dataset.orgId;
             switchView('tasks');
-            
+
             const orgFilter = document.querySelector('select[name="org-filter"]');
             if (orgFilter) {
                 orgFilter.value = orgId;
@@ -820,7 +827,7 @@ async function restoreTask(taskId) {
     // Add this before the organizations container in the HTML
     document.getElementById('organizations-view').insertBefore(orgSearchContainer, document.getElementById('organizations-container'));
 
-    orgSearchInput.addEventListener('input', function() {
+    orgSearchInput.addEventListener('input', function () {
         const searchTerm = this.value.toLowerCase().trim();
         const orgCards = document.querySelectorAll('.org-card');
         let visibleCount = 0;
@@ -831,9 +838,9 @@ async function restoreTask(taskId) {
             const orgMembers = Array.from(card.querySelectorAll('.member-name'))
                 .map(member => member.textContent.toLowerCase());
 
-            const matches = orgName.includes(searchTerm) || 
-                            orgDescription.includes(searchTerm) || 
-                            orgMembers.some(member => member.includes(searchTerm));
+            const matches = orgName.includes(searchTerm) ||
+                orgDescription.includes(searchTerm) ||
+                orgMembers.some(member => member.includes(searchTerm));
 
             card.style.display = matches ? '' : 'none';
             if (matches) visibleCount++;
@@ -842,10 +849,10 @@ async function restoreTask(taskId) {
         // Update results count with more detail
         const resultsCountSpan = document.querySelector('.search-results-count') || document.createElement('span');
         resultsCountSpan.className = 'search-results-count';
-        resultsCountSpan.textContent = searchTerm 
+        resultsCountSpan.textContent = searchTerm
             ? `Found ${visibleCount} organization${visibleCount !== 1 ? 's' : ''} matching "${searchTerm}"`
             : `Showing all ${visibleCount} organization${visibleCount !== 1 ? 's' : ''}`;
-        
+
         // Insert the counter after the search input if it doesn't exist
         if (!document.querySelector('.search-results-count')) {
             orgSearchContainer.appendChild(resultsCountSpan);
@@ -887,7 +894,7 @@ async function restoreTask(taskId) {
                 </div>
             `;
             document.body.appendChild(addOrgModal);
-            
+
             // Add close functionality
             addOrgModal.addEventListener('click', (e) => {
                 if (e.target === addOrgModal) addOrgModal.style.display = 'none';
@@ -959,7 +966,7 @@ async function restoreTask(taskId) {
                 </div>
             `;
             document.body.appendChild(manageOrgModal);
-            
+
             // Add close functionality
             manageOrgModal.addEventListener('click', (e) => {
                 if (e.target === manageOrgModal) manageOrgModal.style.display = 'none';
@@ -972,7 +979,7 @@ async function restoreTask(taskId) {
         createModals();
         const modal = document.getElementById('manage-org-modal');
         const form = document.getElementById('manage-org-form');
-        
+
         // Fill in existing values
         form.querySelector('#edit-org-name').value = organization.name;
         form.querySelector('#edit-org-description').value = organization.description || '';
@@ -994,7 +1001,7 @@ async function restoreTask(taskId) {
         // Handle adding new members
         const addMemberBtn = form.querySelector('#add-member-btn');
         const newMemberInput = form.querySelector('#new-member-input');
-        
+
         addMemberBtn.onclick = async () => {
             const username = newMemberInput.value.trim();
             if (username) {
@@ -1065,7 +1072,7 @@ async function restoreTask(taskId) {
                     await loadData();
                     showNotification('Organization updated successfully', 'success');
                 }
-                
+
             } catch (error) {
                 console.error('Error updating organization:', error);
                 showNotification(error.message || 'Error updating organization', 'error');
@@ -1120,7 +1127,7 @@ async function restoreTask(taskId) {
 
         // Get the filter options container
         const filterOptions = document.querySelector('.filter-options');
-        
+
         // Create tag filter select if it doesn't exist
         let tagSelect = filterOptions.querySelector('select[name="tag-filter"]');
         if (!tagSelect) {
@@ -1146,9 +1153,9 @@ async function restoreTask(taskId) {
     }
 
     // Add event listener for the sort dropdown
-    document.querySelector('select[name="sort-by"]').addEventListener('change', function() {
+    document.querySelector('select[name="sort-by"]').addEventListener('change', function () {
         const sortOrder = this.value;
-        
+
         // Immediate sort when dropdown changes
         if (sortOrder === 'asc') {
             // Sort earliest first
@@ -1167,7 +1174,7 @@ async function restoreTask(taskId) {
                 return new Date(b.dueDate) - new Date(a.dueDate);
             });
         }
-        
+
         // Immediately render the sorted tasks
         renderTasks(filteredTasks);
     });
@@ -1201,7 +1208,7 @@ async function restoreTask(taskId) {
         filteredTasks = allTasks.filter(task => {
             const matchesOrg = !orgFilter || (task.organization && task.organization._id === orgFilter);
             const matchesStatus = statusFilter === 'all' || task.status.toLowerCase() === statusFilter.toLowerCase();
-            const matchesSearch = !searchInput || 
+            const matchesSearch = !searchInput ||
                 task.title.toLowerCase().includes(searchInput) ||
                 (task.description && task.description.toLowerCase().includes(searchInput));
             const matchesTag = !tagFilter || (task.tags && task.tags.includes(tagFilter));
@@ -1221,10 +1228,10 @@ async function restoreTask(taskId) {
         // Create organization tasks pane
         const orgTasksPane = document.createElement('div');
         orgTasksPane.className = 'org-tasks-pane modal';
-        
+
         // Filter tasks for this organization
         const orgTasks = allTasks.filter(task => task.organization && task.organization._id === orgId);
-        
+
         // Create the content
         orgTasksPane.innerHTML = `
             <div class="modal-content">
@@ -1359,7 +1366,7 @@ async function restoreTask(taskId) {
     const toggleButton = document.createElement('button');
     toggleButton.className = 'secondary-btn';
     toggleButton.innerHTML = '<i class="fas fa-archive"></i> Show Archived';
-    toggleButton.addEventListener('click', function() {
+    toggleButton.addEventListener('click', function () {
         const isShowingArchived = this.classList.toggle('active');
         if (isShowingArchived) {
             this.innerHTML = '<i class="fas fa-tasks"></i> Show Active';
@@ -1372,7 +1379,7 @@ async function restoreTask(taskId) {
     headerActions.appendChild(toggleButton);
 
     // Add this to your existing code
-    document.querySelector('.sidebar').addEventListener('click', function(e) {
+    document.querySelector('.sidebar').addEventListener('click', function (e) {
         const menuItem = e.target.closest('.menu-item');
         if (menuItem) {
             const icon = menuItem.querySelector('i');
@@ -1384,9 +1391,9 @@ async function restoreTask(taskId) {
 
     // Find the archive button in the sidebar
     const archiveButton = document.querySelector('[data-view="archive"]');
-    
+
     if (archiveButton) {
-        archiveButton.addEventListener('click', function(e) {
+        archiveButton.addEventListener('click', function (e) {
             e.preventDefault();
             console.log('Archive button clicked'); // Debug log
             // Direct navigation to archive page
@@ -1397,7 +1404,7 @@ async function restoreTask(taskId) {
     }
 
     // Add this event listener to refresh tasks when requested
-    window.addEventListener('message', function(event) {
+    window.addEventListener('message', function (event) {
         if (event.data === 'refreshTasks') {
             loadData(); // Ensure this function fetches the latest tasks
         }
