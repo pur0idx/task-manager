@@ -1675,4 +1675,64 @@ body {
     border-color: var(--border-color);
     transition: all 0.3s ease;
 }
+/* Theme Variables */
+:root {
+    /* Light theme (default) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --border-color: #dddddd;
+    --card-bg: #ffffff;
+    --sidebar-bg: #f8f9fa;  /* Light sidebar background */
+    --sidebar-text: #333333; /* Light sidebar text */
+    --sidebar-hover: #e9ecef; /* Light sidebar hover */
+}
+
+[data-theme="dark"] {
+    /* Dark theme */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: #404040;
+    --card-bg: #2d2d2d;
+    --sidebar-bg: #2d2d2d;    /* Dark sidebar background */
+    --sidebar-text: #ffffff;   /* Dark sidebar text */
+    --sidebar-hover: #3d3d3d;  /* Dark sidebar hover */
+}
+
+/* Apply theme colors to sidebar */
+.sidebar {
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    border-color: var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.sidebar a, 
+.sidebar button {
+    color: var(--sidebar-text);
+}
+
+.sidebar a:hover,
+.sidebar button:hover {
+    background-color: var(--sidebar-hover);
+}
+
+/* Your existing theme styles */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.card, .modal-content {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    transition: all 0.3s ease;
+}
+
+
+
 
