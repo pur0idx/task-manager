@@ -1372,4 +1372,11 @@ async function restoreTask(taskId) {
     } else {
         console.error('Archive button not found'); // Debug log
     }
+
+    // Add this event listener to refresh tasks when requested
+    window.addEventListener('message', function(event) {
+        if (event.data === 'refreshTasks') {
+            loadData(); // Ensure this function fetches the latest tasks
+        }
+    });
 });

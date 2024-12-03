@@ -42,4 +42,29 @@ router.patch('/tasks/:id/archive', auth, async (req, res) => {
     }
 });
 
+// Restore task from archive
+router.patch('/api/tasks/:id/restore', auth, async (req, res) => {
+    try {
+        const task = await Task.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: { 
+                    archived: false,
+                    archivedAt: null
+                }
+            },
+            { new: true }
+        );
+
+        if (!task) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        res.json({ success: true, task });
+    } catch (error) {
+        console.error('Error restoring task:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 module.exports = router;
