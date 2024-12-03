@@ -277,8 +277,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             ]);
 
             if (tasks) {
-                allTasks = tasks;
-                filteredTasks = [...tasks];
+                // Filter out archived tasks from the main view
+                allTasks = tasks.filter(task => !task.archived);
+                filteredTasks = [...allTasks];
                 renderTasks(filteredTasks);
                 await populateTagFilter();
                 await populateOrganizationFilter();
@@ -291,7 +292,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             app.style.display = 'flex';
         } catch (error) {
             console.error('Error loading data:', error);
-            alert('Error loading data. Please try again.');
+            showNotification('Error loading data. Please try again.', 'error');
         }
     }
 
@@ -588,12 +589,67 @@ document.addEventListener('DOMContentLoaded', async function () {
     };
 
     // Helper function for notifications
-    const showNotification = (message, type = 'info') => {
-        // You can enhance this with a proper notification system
-        // For now, using alert
-        alert(message);
-    };
+   // Add this notification function
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('notification-container');
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    container.appendChild(notification);
+    
+    // Remove notification after 3 seconds
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
 
+// Update your task action handlers to use notifications
+tasksContainer.addEventListener('click', async (e) => {
+    const deleteBtn = e.target.closest('.delete-task-btn');
+    
+    if (deleteBtn) {
+        const taskId = deleteBtn.dataset.taskId;
+        try {
+            const confirmed = await showConfirmDialog('Are you sure you want to archive this task?');
+            if (!confirmed) return;
+
+            const response = await apiRequest(`/api/tasks/${taskId}/archive`, {
+                method: 'PATCH',
+                body: JSON.stringify({
+                    archived: true,
+                    archivedAt: new Date()
+                })
+            });
+
+            if (response) {
+                showNotification('Task archived successfully', 'success');
+                await loadData();
+            }
+        } catch (error) {
+            console.error('Error archiving task:', error);
+            showNotification('Error archiving task. Please try again.', 'error');
+        }
+    }
+});
+
+// Add notifications for other actions
+async function restoreTask(taskId) {
+    try {
+        const response = await apiRequest(`/api/tasks/${taskId}/restore`, {
+            method: 'PATCH',
+            body: JSON.stringify({ archived: false })
+        });
+
+        if (response) {
+            showNotification('Task restored successfully', 'success');
+            await loadArchivedTasks();
+        }
+    } catch (error) {
+        console.error('Error restoring task:', error);
+        showNotification('Error restoring task. Please try again.', 'error');
+    }
+}
 
     //deleteTask
     const deleteTask = async (taskId) => {

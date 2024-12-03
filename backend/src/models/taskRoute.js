@@ -21,7 +21,7 @@ router.delete('/api/tasks/:id', auth, async (req, res) => {
 });
 
 // Archive a task
-router.patch('/tasks/:id/archive', authenticateToken, async (req, res) => {
+router.patch('/tasks/:id/archive', auth, async (req, res) => {
     try {
         const task = await Task.findByIdAndUpdate(
             req.params.id,
