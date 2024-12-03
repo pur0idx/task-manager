@@ -127,12 +127,28 @@ document.addEventListener('DOMContentLoaded', async function () {
         `;
 
         const tasksHtml = tasks.map(task => {
-            // Format due date
+            // Format due date with time from now
             let dueDateDisplay = '—';
+            let dueDateTitle = ''; // For hover tooltip
             if (task.dueDate) {
                 const dueDate = new Date(task.dueDate);
                 const options = { month: 'short', day: 'numeric', year: 'numeric' };
                 dueDateDisplay = dueDate.toLocaleDateString('en-US', options);
+                
+                // Add relative time for better context
+                const today = new Date();
+                const diffTime = dueDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays < 0) {
+                    dueDateTitle = `Overdue by ${Math.abs(diffDays)} days`;
+                } else if (diffDays === 0) {
+                    dueDateTitle = 'Due today';
+                } else if (diffDays === 1) {
+                    dueDateTitle = 'Due tomorrow';
+                } else {
+                    dueDateTitle = `Due in ${diffDays} days`;
+                }
             }
 
             // Format tags with better styling
@@ -151,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                     <div class="task-organization">
                         ${task.organization ? task.organization.name : '—'}
                     </div>
-                    <div class="task-due-date ${getDueDateClass(task.dueDate)}">
+                    <div class="task-due-date ${getDueDateClass(task.dueDate)}" title="${dueDateTitle}">
                         ${dueDateDisplay}
                     </div>
                     <div class="task-tags-container">
@@ -191,7 +207,14 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     // Helper function to get due date class
-    function getDueDateClass(diffDays) {
+    function getDueDateClass(dueDate) {
+        if (!dueDate) return '';
+        
+        const today = new Date();
+        const due = new Date(dueDate);
+        const diffTime = due - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
         if (diffDays < 0) return 'overdue';
         if (diffDays === 0) return 'due-today';
         if (diffDays === 1) return 'due-tomorrow';
@@ -298,24 +321,22 @@ document.addEventListener('DOMContentLoaded', async function () {
         const statusFilter = document.querySelector('select[name="status"]').value;
         const searchInput = document.querySelector('.search-bar input').value.toLowerCase().trim();
         const tagFilter = document.querySelector('select[name="tag-filter"]').value;
+        const sortOrder = document.querySelector('select[name="sort-by"]').value;
     
+        // First apply all filters
         filteredTasks = allTasks.filter(task => {
-            // Organization filter
             const matchesOrg = !orgFilter ||
                 (task.organization && task.organization._id === orgFilter);
     
-            // Status filter
             const matchesStatus = statusFilter === 'all' ||
                 task.status.toLowerCase() === statusFilter.toLowerCase();
     
-            // Search filter
             const matchesSearch = !searchInput || 
                 task.title.toLowerCase().includes(searchInput) ||
                 (task.description && task.description.toLowerCase().includes(searchInput)) ||
                 (task.tags && task.tags.some(tag => tag.toLowerCase().includes(searchInput))) ||
                 (task.organization && task.organization.name.toLowerCase().includes(searchInput));
     
-            // Tag filter
             const matchesTag = !tagFilter || (
                 task.tags && 
                 Array.isArray(task.tags) && 
@@ -325,6 +346,26 @@ document.addEventListener('DOMContentLoaded', async function () {
             return matchesOrg && matchesStatus && matchesSearch && matchesTag;
         });
     
+        // Then apply sorting if a sort order is selected
+        if (sortOrder !== 'none') {
+            filteredTasks.sort((a, b) => {
+                // Handle cases where dueDate is undefined or null
+                if (!a.dueDate && !b.dueDate) return 0;
+                if (!a.dueDate) return 1;  // Push tasks without due dates to the end
+                if (!b.dueDate) return -1; // Push tasks without due dates to the end
+
+                const dateA = new Date(a.dueDate);
+                const dateB = new Date(b.dueDate);
+
+                if (sortOrder === 'asc') {
+                    return dateA - dateB;
+                } else {
+                    return dateB - dateA;
+                }
+            });
+        }
+    
+        // Update the UI
         renderTasks(filteredTasks);
     
         // Update results count
@@ -906,7 +947,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
 
                 const response = await apiRequest(`/api/organizations/${organization._id}`, {
-                    method: 'PATCH',
+                    method: 'PUT',
                     body: JSON.stringify(updatedData)
                 });
 
@@ -993,5 +1034,59 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Add event listener for tag filtering
         tagSelect.addEventListener('change', applyFilters);
+    }
+
+    // Add event listener for the sort dropdown
+    document.querySelector('select[name="sort-by"]').addEventListener('change', applyFilters);
+
+    // Add this function at the top level
+    function sortTasks(tasks, sortOrder) {
+        if (!sortOrder || sortOrder === 'none') return tasks;
+
+        return [...tasks].sort((a, b) => {
+            if (sortOrder === 'asc') {
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(a.dueDate) - new Date(b.dueDate);
+            } else {
+                if (!a.dueDate) return 1;
+                if (!b.dueDate) return -1;
+                return new Date(b.dueDate) - new Date(a.dueDate);
+            }
+        });
+    }
+
+    // Update the event listener for the sort dropdown
+    document.querySelector('select[name="sort-by"]').addEventListener('change', (e) => {
+        const sortOrder = e.target.value;
+        filteredTasks = sortTasks([...allTasks], sortOrder);
+        renderTasks(filteredTasks);
+    });
+
+    // Update the applyFilters function
+    function applyFilters() {
+        const orgFilter = document.querySelector('select[name="org-filter"]').value;
+        const statusFilter = document.querySelector('select[name="status"]').value;
+        const searchInput = document.querySelector('.search-bar input').value.toLowerCase().trim();
+        const tagFilter = document.querySelector('select[name="tag-filter"]').value;
+        const sortOrder = document.querySelector('select[name="sort-by"]').value;
+
+        // First apply all filters
+        filteredTasks = allTasks.filter(task => {
+            const matchesOrg = !orgFilter || (task.organization && task.organization._id === orgFilter);
+            const matchesStatus = statusFilter === 'all' || task.status.toLowerCase() === statusFilter.toLowerCase();
+            const matchesSearch = !searchInput || 
+                task.title.toLowerCase().includes(searchInput) ||
+                (task.description && task.description.toLowerCase().includes(searchInput));
+            const matchesTag = !tagFilter || (task.tags && task.tags.includes(tagFilter));
+
+            return matchesOrg && matchesStatus && matchesSearch && matchesTag;
+        });
+
+        // Then apply sorting
+        filteredTasks = sortTasks(filteredTasks, sortOrder);
+
+        // Update the UI
+        renderTasks(filteredTasks);
     }
 });

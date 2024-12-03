@@ -119,22 +119,20 @@ app.post('/api/signup', async (req, res) => {
 // Task Routes
 app.get('/api/tasks', authenticateJWT, async (req, res) => {
     try {
-        // Get organizations where user is a member
         const userOrgs = await Organization.find({
             'members.user': req.user.id
         }).select('_id');
         
         const orgIds = userOrgs.map(org => org._id);
 
-        // Fetch tasks that either:
-        // 1. Were created by the user, OR
-        // 2. Belong to organizations where the user is a member
         const tasks = await Task.find({
             $or: [
                 { createdBy: req.user.id },
                 { organization: { $in: orgIds } }
             ]
-        }).populate('organization', 'name');
+        })
+        .populate('organization', 'name')
+        .sort({ createdAt: -1 });
 
         res.json(tasks);
     } catch (error) {
@@ -375,7 +373,7 @@ app.delete('/api/organizations/:id', authenticateJWT, async (req, res) => {
     }
 });
 
-// Update organization endpoint
+// Add this endpoint for updating organizations
 app.put('/api/organizations/:id', authenticateJWT, async (req, res) => {
     try {
         const { id } = req.params;
