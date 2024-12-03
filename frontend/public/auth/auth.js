@@ -1,10 +1,11 @@
+const BACKEND_URL = "https://api.final-project.xyz";
+
 document.addEventListener('DOMContentLoaded', function() {
     const signinForm = document.getElementById('signin-form');
     const signupForm = document.getElementById('signup-form');
     const switchToSignup = document.getElementById('switch-to-signup');
     const switchToSignin = document.getElementById('switch-to-signin');
 
-    const BACKEND_URL = 'http://localhost:4096';
 
     // Check if already logged in
     const token = localStorage.getItem('token');

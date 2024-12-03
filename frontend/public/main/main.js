@@ -1,3 +1,5 @@
+const BACKEND_URL = "https://api.final-project.xyz";
+
 document.addEventListener('DOMContentLoaded', async function () {
     // DOM Elements
     const app = document.getElementById('app');
@@ -14,8 +16,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     const sidebar = document.querySelector('.sidebar');
     const toggleBtn = document.querySelector('.toggle-sidebar-btn');
     const mainContent = document.querySelector('.main-content');
-
-    const BACKEND_URL = 'http://localhost:4096';
 
     //FilterOrg
     let allTasks = [];
