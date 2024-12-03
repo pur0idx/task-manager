@@ -342,18 +342,15 @@ document.addEventListener('DOMContentLoaded', async function () {
             const modal = document.getElementById('add-task-modal');
             const form = modal.querySelector('form');
             const modalTitle = modal.querySelector('h2');
+            const submitButton = form.querySelector('button[type="submit"]');  // Get submit button
             
-            // Reset form
+            // Reset form and set for creation mode
             form.reset();
+            modalTitle.textContent = 'Add New Task';
+            submitButton.textContent = 'Create Task';  // Set button text for create mode
             
-            // Set modal title and form handler based on whether we're editing or creating
-            if (task) {
-                modalTitle.textContent = 'Edit Task';
-                showEditTaskModal(task);
-            } else {
-                modalTitle.textContent = 'Add New Task';
-                form.onsubmit = this.handleSubmit;
-            }
+            // Set the form submission handler for creating new task
+            form.onsubmit = this.handleSubmit;
             
             modal.style.display = 'block';
             populateOrganizationDropdowns();
@@ -876,9 +873,11 @@ document.addEventListener('DOMContentLoaded', async function () {
         const addTaskModal = document.getElementById('add-task-modal');
         const form = addTaskModal.querySelector('form');
         const modalTitle = addTaskModal.querySelector('h2');
+        const submitButton = form.querySelector('button[type="submit"]');  // Get submit button
         
-        // Update modal title
+        // Update modal title and button text
         modalTitle.textContent = 'Edit Task';
+        submitButton.textContent = 'Update Task';  // Change button text for edit mode
         
         // Fill in existing values
         form.querySelector('[name="title"]').value = task.title;
@@ -927,5 +926,6 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         // Show the modal
         addTaskModal.style.display = 'block';
+        populateOrganizationDropdowns();
     }
 });
