@@ -1805,29 +1805,39 @@ body {
 
 /* Theme switch button styles */
 .theme-switch-btn {
-    padding: 8px 16px;
-    border-radius: 6px;
+    position: relative;
+    bottom: 20px; /* Reduced space above user info */
+    width: calc(100% - 32px); /* Full width minus padding */
+    margin: 8px 16px; /* Adjusted margins */
+    padding: 10px 16px;
+    border-radius: 8px;
     border: 1px solid var(--border-color);
     background: transparent;
     color: var(--text-color);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 12px;
     font-size: 14px;
-    margin-right: 16px;
+    font-weight: 500;
     transition: all 0.3s ease;
 }
 
-/* Light theme button styles */
+/* Hover effects */
 .theme-switch-btn:hover {
-    background-color: #f5f5f5;
+    background-color: var(--hover-background);
+    transform: translateY(-1px);
 }
 
-/* Dark theme button styles */
+/* Icon styling */
+.theme-switch-btn i {
+    font-size: 16px;
+}
+
+/* Dark mode specific styles */
 [data-theme="dark"] .theme-switch-btn {
     background-color: #000000;
-    color: #ffffff;
     border-color: #404040;
 }
 
@@ -1896,6 +1906,72 @@ body {
 
 [data-theme="dark"] .member-email {
     color: #cccccc;
+}
+
+/* Theme switch button positioning in sidebar */
+.theme-switch-btn {
+    position: relative;
+    bottom: 20px; /* Reduced space above user info */
+    width: calc(100% - 32px); /* Full width minus padding */
+    margin: 8px 16px; /* Adjusted margins */
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+/* Hover effects */
+.theme-switch-btn:hover {
+    background-color: var(--hover-background);
+    transform: translateY(-1px);
+}
+
+/* Icon styling */
+.theme-switch-btn i {
+    font-size: 16px;
+}
+
+/* Dark mode specific styles */
+[data-theme="dark"] .theme-switch-btn {
+    background-color: #000000;
+    border-color: #404040;
+}
+
+[data-theme="dark"] .theme-switch-btn:hover {
+    background-color: #1a1a1a;
+    border-color: #f89b29;
+    color: #f89b29;
+}
+
+[data-theme="dark"] .theme-switch-btn i {
+    color: #f89b29;
+}
+
+/* Adjust sidebar layout */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Move user info to bottom */
+.user-info {
+    margin-top: auto;
+    padding: 1px;
+}
+
+/* Ensure proper spacing */
+.nav-links {
+    flex: 1;
+    margin-bottom: auto;
 }
 
 
