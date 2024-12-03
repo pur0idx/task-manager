@@ -193,10 +193,42 @@ document.addEventListener('DOMContentLoaded', async function () {
             root.style.setProperty('--primary-color', '#f89b29');
             root.style.setProperty('--secondary-color', '#ff8a00');
             root.style.setProperty('--dark-primary-color', '#e68a25');
+            
+            // Update button styles for dark theme
+            themeSwitch.style.backgroundColor = '#000000';
+            themeSwitch.style.color = '#ffffff';
+            themeSwitch.style.borderColor = '#404040';
+            themeSwitchIcon.style.color = '#f89b29';
+            
+            // Add hover effect
+            themeSwitch.onmouseover = function() {
+                this.style.backgroundColor = '#1a1a1a';
+                this.style.borderColor = '#f89b29';
+                this.style.color = '#f89b29';
+            };
+            themeSwitch.onmouseout = function() {
+                this.style.backgroundColor = '#000000';
+                this.style.borderColor = '#404040';
+                this.style.color = '#ffffff';
+            };
         } else {
             root.style.setProperty('--primary-color', '#6E9CDD');
             root.style.setProperty('--secondary-color', '#4A90E2');
             root.style.setProperty('--dark-primary-color', '#5b84bd');
+            
+            // Update button styles for light theme
+            themeSwitch.style.backgroundColor = 'transparent';
+            themeSwitch.style.color = '#333333';
+            themeSwitch.style.borderColor = '#E1E4E8';
+            themeSwitchIcon.style.color = '#333333';
+            
+            // Add hover effect
+            themeSwitch.onmouseover = function() {
+                this.style.backgroundColor = '#f5f5f5';
+            };
+            themeSwitch.onmouseout = function() {
+                this.style.backgroundColor = 'transparent';
+            };
         }
 
         root.setAttribute('data-theme', newTheme);
@@ -204,6 +236,38 @@ document.addEventListener('DOMContentLoaded', async function () {
         updateThemeButton(newTheme);
         updateLogo(newTheme);
     });
+
+    // Initialize button styles based on current theme
+    const initialTheme = document.documentElement.getAttribute('data-theme');
+    if (initialTheme === 'dark') {
+        themeSwitch.style.backgroundColor = '#000000';
+        themeSwitch.style.color = '#ffffff';
+        themeSwitch.style.borderColor = '#404040';
+        themeSwitchIcon.style.color = '#f89b29';
+        
+        themeSwitch.onmouseover = function() {
+            this.style.backgroundColor = '#1a1a1a';
+            this.style.borderColor = '#f89b29';
+            this.style.color = '#f89b29';
+        };
+        themeSwitch.onmouseout = function() {
+            this.style.backgroundColor = '#000000';
+            this.style.borderColor = '#404040';
+            this.style.color = '#ffffff';
+        };
+    } else {
+        themeSwitch.style.backgroundColor = 'transparent';
+        themeSwitch.style.color = '#333333';
+        themeSwitch.style.borderColor = '#E1E4E8';
+        themeSwitchIcon.style.color = '#333333';
+        
+        themeSwitch.onmouseover = function() {
+            this.style.backgroundColor = '#f5f5f5';
+        };
+        themeSwitch.onmouseout = function() {
+            this.style.backgroundColor = 'transparent';
+        };
+    }
 
     function updateThemeButton(theme) {
         if (theme === 'dark') {
