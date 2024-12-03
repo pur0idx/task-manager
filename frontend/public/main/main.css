@@ -362,6 +362,19 @@ body {
     font-weight: 600;
 }
 
+.leave-org-btn {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-block;
+    margin-top: 10px;
+    transition: background-color 0.2s ease;
+}
+
 .task-tags {
     display: flex;
     gap: 10px;

@@ -234,9 +234,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                     ${org.members.find(m => m.user.username === user.username && m.role === 'admin') ? `
                         <button class="manage-org-btn" data-org-id="${org._id}">
                             <i class="fas fa-cog"></i>
-                            Manage
                         </button>
-                    ` : ''}
+                    ` : `
+                        <button class="leave-org-btn" data-org-id="${org._id}">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    `}
                 </div>
                 
                 <p class="org-description">${org.description || 'No description provided'}</p>
@@ -730,10 +733,30 @@ async function restoreTask(taskId) {
 
     // Organization Actions
     organizationsContainer.addEventListener('click', async (e) => {
+        const leaveBtn = e.target.closest('.leave-org-btn');
         const manageBtn = e.target.closest('.manage-org-btn');
         const orgCard = e.target.closest('.org-card');
         
-        if (manageBtn) {
+        if (leaveBtn) {
+            e.stopPropagation(); // Prevent card click
+            const orgId = leaveBtn.dataset.orgId;
+            
+            if (confirm('Are you sure you want to leave this organization?')) {
+                try {
+                    const response = await apiRequest(`/api/organizations/${orgId}/members/leave`, {
+                        method: 'DELETE'
+                    });
+
+                    if (response) {
+                        showNotification('Successfully left the organization', 'success');
+                        await loadData(); // Refresh the organizations list
+                    }
+                } catch (error) {
+                    console.error('Error leaving organization:', error);
+                    showNotification('Error leaving organization', 'error');
+                }
+            }
+        } else if (manageBtn) {
             // Handle manage button click
             e.stopPropagation(); // Prevent card click
             const orgId = orgCard.dataset.orgId;
