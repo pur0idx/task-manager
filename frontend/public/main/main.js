@@ -1419,8 +1419,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Get the current theme from localStorage or default to 'light'
     const currentTheme = localStorage.getItem('theme') || 'light';
     document.documentElement.setAttribute('data-theme', currentTheme);
+    
+    // Apply theme colors immediately on page load
+    const root = document.documentElement;
+    if (currentTheme === 'dark') {
+        root.style.setProperty('--primary-color', '#f89b29');
+        root.style.setProperty('--secondary-color', '#ff8a00');
+        root.style.setProperty('--dark-primary-color', '#e68a25');
+        root.style.setProperty('--background-color', '#000000');
+        root.style.setProperty('--text-color', '#ffffff');
+        root.style.setProperty('--border-color', '#404040');
+        root.style.setProperty('--hover-background', '#1a1a1a');
+    } else {
+        root.style.setProperty('--primary-color', '#6E9CDD');
+        root.style.setProperty('--secondary-color', '#4A90E2');
+        root.style.setProperty('--dark-primary-color', '#5b84bd');
+    }
+    
     updateThemeButton(currentTheme);
-    updateLogo(currentTheme); // Initialize logo based on current theme
+    updateLogo(currentTheme);
 
     themeSwitch.addEventListener('click', function() {
         const root = document.documentElement;
