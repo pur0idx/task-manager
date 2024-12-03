@@ -1410,3 +1410,43 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 });
+document.addEventListener('DOMContentLoaded', function() {
+    // First, let's check if we can find the button
+    const themeSwitch = document.getElementById('theme-switch');
+    console.log('Found theme switch button:', themeSwitch); // Debug log
+
+    // Only proceed if we found the button
+    if (themeSwitch) {
+        // Test with a simple color change first
+        themeSwitch.addEventListener('click', function() {
+            console.log('Button clicked!'); // Debug log
+            
+            // Simple test - just change background color
+            if (document.body.style.backgroundColor === 'black') {
+                document.body.style.backgroundColor = 'white';
+                document.body.style.color = 'black';
+            } else {
+                document.body.style.backgroundColor = 'black';
+                document.body.style.color = 'white';
+            }
+        });
+    } else {
+        console.error('Theme switch button not found!');
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
+    // Basic test to see if our script runs
+    console.log('Script is running');
+    
+    // Try to find the button
+    const themeButton = document.getElementById('theme-switch');
+    console.log('Theme button found:', themeButton);
+    
+    if (themeButton) {
+        themeButton.onclick = function() {
+            console.log('Button clicked');
+        };
+    }
+});
+
+
