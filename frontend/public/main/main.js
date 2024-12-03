@@ -257,11 +257,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 allTasks = tasks;
                 filteredTasks = [...tasks];
                 renderTasks(filteredTasks);
+                await populateTagFilter();
+                await populateOrganizationFilter();
             }
             if (orgs) {
-                organizations = orgs; // Store organizations in the variable
+                organizations = orgs;
                 renderOrganizations(organizations);
-                await populateOrganizationFilter();
             }
             loading.style.display = 'none';
             app.style.display = 'flex';
@@ -307,7 +308,7 @@ document.addEventListener('DOMContentLoaded', async function () {
             const matchesStatus = statusFilter === 'all' ||
                 task.status.toLowerCase() === statusFilter.toLowerCase();
     
-            // Enhanced Search filter
+            // Search filter
             const matchesSearch = !searchInput || 
                 task.title.toLowerCase().includes(searchInput) ||
                 (task.description && task.description.toLowerCase().includes(searchInput)) ||
@@ -315,8 +316,11 @@ document.addEventListener('DOMContentLoaded', async function () {
                 (task.organization && task.organization.name.toLowerCase().includes(searchInput));
     
             // Tag filter
-            const matchesTag = !tagFilter ||
-                (task.tags && task.tags.includes(tagFilter));
+            const matchesTag = !tagFilter || (
+                task.tags && 
+                Array.isArray(task.tags) && 
+                task.tags.some(tag => tag.trim() === tagFilter.trim())
+            );
     
             return matchesOrg && matchesStatus && matchesSearch && matchesTag;
         });
@@ -949,4 +953,45 @@ document.addEventListener('DOMContentLoaded', async function () {
         form.reset();
         modal.style.display = 'block';
     });
+
+    // Add this function to populate the tag filter dropdown
+    async function populateTagFilter() {
+        // Get unique tags from all tasks
+        const uniqueTags = new Set();
+        allTasks.forEach(task => {
+            if (task.tags && Array.isArray(task.tags)) {
+                task.tags.forEach(tag => {
+                    if (tag && tag.trim()) {
+                        uniqueTags.add(tag.trim());
+                    }
+                });
+            }
+        });
+
+        // Get the filter options container
+        const filterOptions = document.querySelector('.filter-options');
+        
+        // Create tag filter select if it doesn't exist
+        let tagSelect = filterOptions.querySelector('select[name="tag-filter"]');
+        if (!tagSelect) {
+            tagSelect = document.createElement('select');
+            tagSelect.name = 'tag-filter';
+            filterOptions.appendChild(tagSelect);
+        }
+
+        // Create options HTML
+        const options = Array.from(uniqueTags)
+            .sort()
+            .map(tag => `<option value="${tag}">${tag}</option>`)
+            .join('');
+
+        // Set the innerHTML with default option
+        tagSelect.innerHTML = `
+            <option value="">All Tags</option>
+            ${options}
+        `;
+
+        // Add event listener for tag filtering
+        tagSelect.addEventListener('change', applyFilters);
+    }
 });
