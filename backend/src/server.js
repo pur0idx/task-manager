@@ -124,10 +124,25 @@ app.post('/api/signup', async (req, res) => {
 });
 
 // Task Routes
-app.get('/api/tasks', authenticateToken, async (req, res) => {
+app.get('/api/tasks', authenticateJWT, async (req, res) => {
     try {
-        const tasks = await Task.find({ createdBy: req.user.id })
-            .populate('organization', 'name');
+        // Get organizations where user is a member
+        const userOrgs = await Organization.find({
+            'members.user': req.user.id
+        }).select('_id');
+        
+        const orgIds = userOrgs.map(org => org._id);
+
+        // Fetch tasks that either:
+        // 1. Were created by the user, OR
+        // 2. Belong to organizations where the user is a member
+        const tasks = await Task.find({
+            $or: [
+                { createdBy: req.user.id },
+                { organization: { $in: orgIds } }
+            ]
+        }).populate('organization', 'name');
+
         res.json(tasks);
     } catch (error) {
         console.error('Error fetching tasks:', error);
