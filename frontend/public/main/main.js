@@ -646,28 +646,27 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Organization Actions
     organizationsContainer.addEventListener('click', async (e) => {
+        const manageBtn = e.target.closest('.manage-org-btn');
         const orgCard = e.target.closest('.org-card');
-        if (orgCard) {
+        
+        if (manageBtn) {
+            // Handle manage button click
+            e.stopPropagation(); // Prevent card click
             const orgId = orgCard.dataset.orgId;
-            console.log('Organization clicked:', orgId); // Debug log
-
-            // Switch to tasks view
+            const organization = organizations.find(org => org._id === orgId);
+            if (organization) {
+                showManageOrgModal(organization);
+            }
+        } else if (orgCard) {
+            // Handle card click (show tasks)
+            const orgId = orgCard.dataset.orgId;
             switchView('tasks');
             
-            // Set the organization filter dropdown
             const orgFilter = document.querySelector('select[name="org-filter"]');
             if (orgFilter) {
                 orgFilter.value = orgId;
+                applyFilters();
             }
-
-            // Filter tasks for this organization
-            filteredTasks = allTasks.filter(task => {
-                console.log('Checking task:', task.title, 'Organization:', task.organization?._id); // Debug log
-                return task.organization && task.organization._id === orgId;
-            });
-
-            console.log('Filtered tasks:', filteredTasks); // Debug log
-            renderTasks(filteredTasks);
         }
     });
 
@@ -1178,47 +1177,54 @@ document.addEventListener('DOMContentLoaded', async function () {
         }
     });
 
-    // Add archive function
+    // Update the archiveTask function
     async function archiveTask(taskId) {
         try {
-            const response = await fetch(`/api/tasks/${taskId}/archive`, {
+            const token = localStorage.getItem('token'); // Get token directly from localStorage
+            if (!token) {
+                window.location.href = '/auth';
+                return;
+            }
+
+            const confirmed = await showConfirmDialog('Are you sure you want to archive this task?');
+            if (!confirmed) return;
+
+            const response = await fetch(`${BACKEND_URL}/api/tasks/${taskId}/archive`, {
                 method: 'PATCH',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${getToken()}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
-            if (!response.ok) throw new Error('Failed to archive task');
+            const data = await response.json();
 
-            // Remove task from current view
-            const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
-            if (taskElement) {
-                taskElement.remove();
+            if (data.success) {
+                // Remove the task from DOM immediately for better UX
+                const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+                if (taskElement) {
+                    taskElement.remove();
+                }
+
+                // Update the tasks lists
+                allTasks = allTasks.filter(task => task._id !== taskId);
+                filteredTasks = filteredTasks.filter(task => task._id !== taskId);
+
+                showNotification('Task archived successfully', 'success');
+            } else {
+                throw new Error(data.message || 'Failed to archive task');
             }
-
-            showNotification('Task archived successfully', 'success');
         } catch (error) {
             console.error('Error archiving task:', error);
-            showNotification('Failed to archive task', 'error');
+            showNotification('Error archiving task. Please try again.', 'error');
         }
     }
 
-    // Modify the delete button click handler
+    // Update the event listener for the delete button
     document.addEventListener('click', async (e) => {
         if (e.target.closest('.delete-task-btn')) {
             const taskId = e.target.closest('.delete-task-btn').dataset.taskId;
-            
-            const confirmDelete = await showConfirmDialog(
-                'Archive Task',
-                'Do you want to archive this task? You can access archived tasks later.',
-                'Archive',
-                'Cancel'
-            );
-
-            if (confirmDelete) {
-                await archiveTask(taskId);
-            }
+            await archiveTask(taskId);
         }
     });
 

@@ -44,6 +44,14 @@ const taskSchema = new mongoose.Schema({
     deletedAt: {
         type: Date,
         default: null
+    },
+    archived: {
+        type: Boolean,
+        default: false
+    },
+    archivedAt: {
+        type: Date,
+        default: null
     }
 });
 
