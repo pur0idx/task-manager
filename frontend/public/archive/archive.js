@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function () {
-    const BACKEND_URL = 'https://api.final-project.xyz';
+    const BACKEND_URL = 'http://localhost:4096';
     const token = localStorage.getItem('token');
     const archivedTasksContainer = document.getElementById('archived-tasks-container');
     
@@ -169,6 +169,122 @@ document.addEventListener('DOMContentLoaded', async function () {
         setTimeout(() => {
             notification.remove();
         }, 3000);
+    }
+
+    // Theme switching functionality
+    const themeSwitch = document.getElementById('theme-switch');
+    const themeSwitchIcon = themeSwitch.querySelector('i');
+    const themeSwitchText = themeSwitch.querySelector('span');
+    const expandedLogo = document.querySelector('.logo');
+    
+    // Get the current theme from localStorage or default to 'light'
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    updateThemeButton(currentTheme);
+    updateLogo(currentTheme);
+
+    themeSwitch.addEventListener('click', function() {
+        const root = document.documentElement;
+        const currentTheme = root.getAttribute('data-theme');
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        // Update CSS variables based on theme
+        if (newTheme === 'dark') {
+            root.style.setProperty('--primary-color', '#f89b29');
+            root.style.setProperty('--secondary-color', '#ff8a00');
+            root.style.setProperty('--dark-primary-color', '#e68a25');
+            
+            // Update button styles for dark theme
+            themeSwitch.style.backgroundColor = '#000000';
+            themeSwitch.style.color = '#ffffff';
+            themeSwitch.style.borderColor = '#404040';
+            themeSwitchIcon.style.color = '#f89b29';
+            
+            // Add hover effect
+            themeSwitch.onmouseover = function() {
+                this.style.backgroundColor = '#1a1a1a';
+                this.style.borderColor = '#f89b29';
+                this.style.color = '#f89b29';
+            };
+            themeSwitch.onmouseout = function() {
+                this.style.backgroundColor = '#000000';
+                this.style.borderColor = '#404040';
+                this.style.color = '#ffffff';
+            };
+        } else {
+            root.style.setProperty('--primary-color', '#6E9CDD');
+            root.style.setProperty('--secondary-color', '#4A90E2');
+            root.style.setProperty('--dark-primary-color', '#5b84bd');
+            
+            // Update button styles for light theme
+            themeSwitch.style.backgroundColor = 'transparent';
+            themeSwitch.style.color = '#333333';
+            themeSwitch.style.borderColor = '#E1E4E8';
+            themeSwitchIcon.style.color = '#333333';
+            
+            // Add hover effect
+            themeSwitch.onmouseover = function() {
+                this.style.backgroundColor = '#f5f5f5';
+            };
+            themeSwitch.onmouseout = function() {
+                this.style.backgroundColor = 'transparent';
+            };
+        }
+
+        root.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeButton(newTheme);
+        updateLogo(newTheme);
+    });
+
+    // Initialize button styles based on current theme
+    const initialTheme = document.documentElement.getAttribute('data-theme');
+    if (initialTheme === 'dark') {
+        themeSwitch.style.backgroundColor = '#000000';
+        themeSwitch.style.color = '#ffffff';
+        themeSwitch.style.borderColor = '#404040';
+        themeSwitchIcon.style.color = '#f89b29';
+        
+        themeSwitch.onmouseover = function() {
+            this.style.backgroundColor = '#1a1a1a';
+            this.style.borderColor = '#f89b29';
+            this.style.color = '#f89b29';
+        };
+        themeSwitch.onmouseout = function() {
+            this.style.backgroundColor = '#000000';
+            this.style.borderColor = '#404040';
+            this.style.color = '#ffffff';
+        };
+    } else {
+        themeSwitch.style.backgroundColor = 'transparent';
+        themeSwitch.style.color = '#333333';
+        themeSwitch.style.borderColor = '#E1E4E8';
+        themeSwitchIcon.style.color = '#333333';
+        
+        themeSwitch.onmouseover = function() {
+            this.style.backgroundColor = '#f5f5f5';
+        };
+        themeSwitch.onmouseout = function() {
+            this.style.backgroundColor = 'transparent';
+        };
+    }
+
+    function updateThemeButton(theme) {
+        if (theme === 'dark') {
+            themeSwitchIcon.className = 'fas fa-sun';
+            themeSwitchText.textContent = 'Light Mode';
+        } else {
+            themeSwitchIcon.className = 'fas fa-moon';
+            themeSwitchText.textContent = 'Dark Mode';
+        }
+    }
+
+    function updateLogo(theme) {
+        if (theme === 'dark') {
+            expandedLogo.src = '../resource/logo/Inverted.png';
+        } else {
+            expandedLogo.src = '../resource/logo/Dark-noBG.png';
+        }
     }
 
     // Initial load

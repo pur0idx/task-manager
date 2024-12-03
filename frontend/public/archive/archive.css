@@ -270,3 +270,61 @@ body {
     margin-left: auto;
     z-index: 1;
 }
+
+/* Add dark mode variables */
+[data-theme="dark"] {
+    --background-color: #000000;
+    --card-background: #000000;
+    --text-color: #ffffff;
+    --border-color: #404040;
+    --hover-bg: #1a1a1a;
+}
+
+/* Theme switch button */
+.theme-switch-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-right: 16px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+}
+
+/* Dark mode styles */
+[data-theme="dark"] body {
+    background-color: #000000;
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .tasks-list-header,
+[data-theme="dark"] .task-item {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+[data-theme="dark"] .task-title {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .archived-items {
+    background-color: #000000;
+    border-color: #404040;
+}
+
+[data-theme="dark"] .back-button {
+    color: #e0e0e0;
+}
+
+[data-theme="dark"] .back-button:hover {
+    background-color: #1a1a1a;
+}
