@@ -1481,16 +1481,16 @@ body {
 .task-list-item {
     display: grid;
     grid-template-columns: 
-        2fr    /* Title */
-        1fr    /* Due Date */
-        1fr    /* Tags */
-        1.5fr  /* Organization */
-        1fr    /* Status */
-        0.5fr; /* Actions */
+        200px  /* Title */
+        150px
+        100px
+        100px
+        100px  /* Status */
+        100px; /* Actions */
     align-items: center;
     padding: 12px 20px;
     gap: 10px;
-    width: 100%; /* Use full width */
+    min-width: max-content;
 }
 
 .tasks-list-header {
@@ -1524,21 +1524,20 @@ body {
 
 /* Mobile responsiveness */
 @media screen and (max-width: 992px) {
+    .tasks-list {
+        -webkit-overflow-scrolling: touch;
+    }
+
     .tasks-list-header,
     .task-list-item {
         grid-template-columns: 
-            2fr    /* Title */
-            1fr    /* Due Date */
-            1fr    /* Tags */
-            1fr    /* Status */
-            0.5fr; /* Actions */
+            150px  /* Title */
+            120px
+            80px
+            80px
+            80px  /* Status */
+            80px;  /* Actions */
         gap: 8px;
         padding: 12px 16px;
-    }
-
-    /* Hide organization column */
-    .tasks-list-header div:nth-child(4),
-    .task-list-item div:nth-child(4) {
-        display: none;
     }
 }
