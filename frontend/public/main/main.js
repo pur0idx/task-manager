@@ -338,9 +338,25 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Task Modal Handlers
     const taskModal = {
-        show() {
-            addTaskModal.style.display = 'block';
-            populateOrganizationDropdowns(); // Populate organizations when modal opens
+        show(task = null) {
+            const modal = document.getElementById('add-task-modal');
+            const form = modal.querySelector('form');
+            const modalTitle = modal.querySelector('h2');
+            
+            // Reset form
+            form.reset();
+            
+            // Set modal title and form handler based on whether we're editing or creating
+            if (task) {
+                modalTitle.textContent = 'Edit Task';
+                showEditTaskModal(task);
+            } else {
+                modalTitle.textContent = 'Add New Task';
+                form.onsubmit = this.handleSubmit;
+            }
+            
+            modal.style.display = 'block';
+            populateOrganizationDropdowns();
         },
         hide() {
             addTaskModal.style.display = 'none';
@@ -493,22 +509,18 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     // Task Actions
     tasksContainer.addEventListener('click', async (e) => {
-        //const deleteBtn = e.target.closest('.delete-task-btn');
-        // if (deleteBtn) {
-        //     const taskId = deleteBtn.dataset.taskId;
-        //     if (confirm('Are you sure you want to delete this task?')) {
-        //         try {
-        //             await apiRequest(`/api/tasks/${taskId}`, { method: 'DELETE' });
-        //             loadData();
-        //         } catch (error) {
-        //             alert('Error deleting task');
-        //         }
-        //     }
-        // }
         const deleteBtn = e.target.closest('.delete-task-btn');
+        const editBtn = e.target.closest('.task-action-btn:not(.delete-task-btn)');
+        
         if (deleteBtn) {
             const taskId = deleteBtn.dataset.taskId;
             await deleteTask(taskId);
+        } else if (editBtn) {
+            const taskId = editBtn.closest('.task-list-item').dataset.taskId;
+            const task = allTasks.find(t => t._id === taskId);
+            if (task) {
+                showEditTaskModal(task);
+            }
         }
     });
 
@@ -811,16 +823,19 @@ document.addEventListener('DOMContentLoaded', async function () {
                 }
 
                 const response = await apiRequest(`/api/organizations/${organization._id}`, {
-                    method: 'PUT',
+                    method: 'PATCH',
                     body: JSON.stringify(updatedData)
                 });
 
-                modal.style.display = 'none';
-                await loadData();
+                if (response) {
+                    modal.style.display = 'none';
+                    await loadData();
+                    showNotification('Organization updated successfully', 'success');
+                }
                 
             } catch (error) {
                 console.error('Error updating organization:', error);
-                alert(error.message || 'Error updating organization');
+                showNotification(error.message || 'Error updating organization', 'error');
             }
         };
 
@@ -855,4 +870,62 @@ document.addEventListener('DOMContentLoaded', async function () {
         form.reset();
         modal.style.display = 'block';
     });
+
+    // Add this function to handle task editing
+    function showEditTaskModal(task) {
+        const addTaskModal = document.getElementById('add-task-modal');
+        const form = addTaskModal.querySelector('form');
+        const modalTitle = addTaskModal.querySelector('h2');
+        
+        // Update modal title
+        modalTitle.textContent = 'Edit Task';
+        
+        // Fill in existing values
+        form.querySelector('[name="title"]').value = task.title;
+        form.querySelector('[name="description"]').value = task.description || '';
+        form.querySelector('[name="dueDate"]').value = task.dueDate ? task.dueDate.split('T')[0] : '';
+        form.querySelector('[name="organization"]').value = task.organization ? task.organization._id : '';
+        form.querySelector('[name="tags"]').value = task.tags ? task.tags.join(', ') : '';
+        form.querySelector('[name="status"]').value = task.status;
+
+        // Update form submission handler for editing
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            try {
+                const updatedData = {
+                    title: form.querySelector('[name="title"]').value.trim(),
+                    description: form.querySelector('[name="description"]').value.trim(),
+                    dueDate: form.querySelector('[name="dueDate"]').value,
+                    organization: form.querySelector('[name="organization"]').value || null,
+                    tags: form.querySelector('[name="tags"]').value
+                        .split(',')
+                        .map(tag => tag.trim())
+                        .filter(tag => tag),
+                    status: form.querySelector('[name="status"]').value
+                };
+
+                // Validate required fields
+                if (!updatedData.title) {
+                    throw new Error('Title is required');
+                }
+
+                const response = await apiRequest(`/api/tasks/${task._id}`, {
+                    method: 'PUT',
+                    body: JSON.stringify(updatedData)
+                });
+
+                if (response) {
+                    await loadData();
+                    taskModal.hide();
+                    showNotification('Task updated successfully', 'success');
+                }
+            } catch (error) {
+                console.error('Error updating task:', error);
+                showNotification(error.message || 'Error updating task', 'error');
+            }
+        };
+
+        // Show the modal
+        addTaskModal.style.display = 'block';
+    }
 });
