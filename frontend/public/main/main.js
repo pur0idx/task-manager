@@ -135,6 +135,16 @@ document.addEventListener('DOMContentLoaded', async function () {
                 dueDateDisplay = dueDate.toLocaleDateString('en-US', options);
             }
 
+            // Format tags with better styling
+            const tagsHtml = task.tags && Array.isArray(task.tags) && task.tags.length > 0
+                ? task.tags.map(tag => `
+                    <span class="task-tag">
+                        <i class="fas fa-tag"></i>
+                        ${tag}
+                    </span>
+                `).join('')
+                : '—';
+
             return `
                 <div class="task-list-item" data-task-id="${task._id}">
                     <div class="task-title">${task.title}</div>
@@ -143,6 +153,9 @@ document.addEventListener('DOMContentLoaded', async function () {
                     </div>
                     <div class="task-due-date ${getDueDateClass(task.dueDate)}">
                         ${dueDateDisplay}
+                    </div>
+                    <div class="task-tags-container">
+                        ${tagsHtml}
                     </div>
                     <div>
                         <span class="task-status ${task.status.toLowerCase()}">${task.status}</span>

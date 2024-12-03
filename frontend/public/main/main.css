@@ -1426,3 +1426,43 @@ body {
 .due-date.due-soon i {
     color: #2563eb;
 }
+
+.task-tags-container {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.task-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    margin: 2px;
+    transition: all 0.2s ease;
+}
+
+.task-tag i {
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+
+.task-tag:hover {
+    background-color: #e5e7eb;
+    cursor: default;
+}
+
+/* Adjust the tasks list header to accommodate tags */
+.tasks-list-header {
+    grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 0.5fr;
+}
+
+.task-list-item {
+    grid-template-columns: 2fr 1fr 1fr 1.5fr 1fr 0.5fr;
+}
