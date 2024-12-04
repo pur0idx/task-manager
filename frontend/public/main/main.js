@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async function () {
                         ${tagsHtml}
                     </div>
                     <div>
-                        <span class="task-status ${task.status.toLowerCase()}">${task.status}</span>
+                        <span class="task-status ${task.status.split(' ').join('-').toLowerCase()}">${task.status}</span>
                     </div>
                     <div class="task-actions">
                         <button class="task-action-btn" title="Edit">
