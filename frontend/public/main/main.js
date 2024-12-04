@@ -369,6 +369,8 @@ document.addEventListener('DOMContentLoaded', async function () {
             });
         }
 
+        console.log(filteredTasks)
+
         // Update the UI
         renderTasks(filteredTasks);
 
@@ -564,6 +566,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     //Filter ORG
     document.querySelector('select[name="org-filter"]').addEventListener('change', applyFilters);
+
+    //Filter Date
+    document.querySelector('select[name="sort-by"]').addEventListener('change',applyFilters)
 
     // Add this new status filter code here
     // Add this modified status filter code
@@ -790,6 +795,9 @@ document.addEventListener('DOMContentLoaded', async function () {
     // Modal Event Listeners
     document.querySelector('[data-action="new-organization"]').addEventListener('click', orgModal.show);
     document.querySelector('[data-action="new-task"]').addEventListener('click', () => taskModal.show());
+
+    document.querySelector('[data-action="new-organization-2"]').addEventListener('click', orgModal.show);
+    document.querySelector('[data-action="new-task-2"]').addEventListener('click', () => taskModal.show());
 
     // Update cancel buttons
     addTaskModal.querySelector('.cancel-btn').addEventListener('click', () => {
@@ -1106,13 +1114,13 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     // Update the add organization button click handler
-    document.getElementById('add-org-btn').addEventListener('click', () => {
-        createModals();
-        const modal = document.getElementById('add-org-modal');
-        const form = document.getElementById('add-org-form');
-        form.reset();
-        modal.style.display = 'block';
-    });
+    // document.getElementById('add-org-btn').addEventListener('click', () => {
+    //     createModals();
+    //     const modal = document.getElementById('add-org-modal');
+    //     const form = document.getElementById('add-org-form');
+    //     form.reset();
+    //     modal.style.display = 'block';
+    // });
 
     // Add this function to populate the tag filter dropdown
     async function populateTagFilter() {
@@ -1295,47 +1303,47 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     // Update the archiveTask function
-    async function archiveTask(taskId) {
-        try {
-            const token = localStorage.getItem('token'); // Get token directly from localStorage
-            if (!token) {
-                window.location.href = '/auth';
-                return;
-            }
+    // async function archiveTask(taskId) {
+    //     try {
+    //         const token = localStorage.getItem('token'); // Get token directly from localStorage
+    //         if (!token) {
+    //             window.location.href = '/auth';
+    //             return;
+    //         }
 
-            const confirmed = await showConfirmDialog('Are you sure you want to archive this task?');
-            if (!confirmed) return;
+    //         const confirmed = await showConfirmDialog('Are you sure you want to archive this task?');
+    //         if (!confirmed) return;
 
-            const response = await fetch(`${BACKEND_URL}/api/tasks/${taskId}/archive`, {
-                method: 'PATCH',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+    //         const response = await fetch(`${BACKEND_URL}/api/tasks/${taskId}/archive`, {
+    //             method: 'PATCH',
+    //             headers: {
+    //                 'Authorization': `Bearer ${token}`,
+    //                 'Content-Type': 'application/json'
+    //             }
+    //         });
 
-            const data = await response.json();
+    //         const data = await response.json();
 
-            if (data.success) {
-                // Remove the task from DOM immediately for better UX
-                const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
-                if (taskElement) {
-                    taskElement.remove();
-                }
+    //         if (data.success) {
+    //             // Remove the task from DOM immediately for better UX
+    //             const taskElement = document.querySelector(`[data-task-id="${taskId}"]`);
+    //             if (taskElement) {
+    //                 taskElement.remove();
+    //             }
 
-                // Update the tasks lists
-                allTasks = allTasks.filter(task => task._id !== taskId);
-                filteredTasks = filteredTasks.filter(task => task._id !== taskId);
+    //             // Update the tasks lists
+    //             allTasks = allTasks.filter(task => task._id !== taskId);
+    //             filteredTasks = filteredTasks.filter(task => task._id !== taskId);
 
-                showNotification('Task archived successfully', 'success');
-            } else {
-                throw new Error(data.message || 'Failed to archive task');
-            }
-        } catch (error) {
-            console.error('Error archiving task:', error);
-            showNotification('Error archiving task. Please try again.', 'error');
-        }
-    }
+    //             showNotification('Task archived successfully', 'success');
+    //         } else {
+    //             throw new Error(data.message || 'Failed to archive task');
+    //         }
+    //     } catch (error) {
+    //         console.error('Error archiving task:', error);
+    //         showNotification('Error archiving task. Reason:' + error.message, 'error');
+    //     }
+    // }
 
     // Update the event listener for the delete button
     document.addEventListener('click', async (e) => {
@@ -1365,21 +1373,21 @@ document.addEventListener('DOMContentLoaded', async function () {
     }
 
     // Add a toggle button in the header to switch between active and archived tasks
-    const headerActions = document.querySelector('.header-actions');
-    const toggleButton = document.createElement('button');
-    toggleButton.className = 'secondary-btn';
-    toggleButton.innerHTML = '<i class="fas fa-archive"></i> Show Archived';
-    toggleButton.addEventListener('click', function () {
-        const isShowingArchived = this.classList.toggle('active');
-        if (isShowingArchived) {
-            this.innerHTML = '<i class="fas fa-tasks"></i> Show Active';
-            loadArchivedTasks();
-        } else {
-            this.innerHTML = '<i class="fas fa-archive"></i> Show Archived';
-            loadTasks();
-        }
-    });
-    headerActions.appendChild(toggleButton);
+    // const headerActions = document.querySelector('.header-actions');
+    // const toggleButton = document.createElement('button');
+    // toggleButton.className = 'secondary-btn';
+    // toggleButton.innerHTML = '<i class="fas fa-archive"></i> Show Archived';
+    // toggleButton.addEventListener('click', function () {
+    //     const isShowingArchived = this.classList.toggle('active');
+    //     if (isShowingArchived) {
+    //         this.innerHTML = '<i class="fas fa-tasks"></i> Show Active';
+    //         loadArchivedTasks();
+    //     } else {
+    //         this.innerHTML = '<i class="fas fa-archive"></i> Show Archived';
+    //         loadTasks();
+    //     }
+    // });
+    // headerActions.appendChild(toggleButton);
 
     // Add this to your existing code
     document.querySelector('.sidebar').addEventListener('click', function (e) {
@@ -1393,18 +1401,18 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 
     // Find the archive button in the sidebar
-    const archiveButton = document.querySelector('[data-view="archive"]');
+    // const archiveButton = document.querySelector('[data-view="archive"]');
 
-    if (archiveButton) {
-        archiveButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            console.log('Archive button clicked'); // Debug log
-            // Direct navigation to archive page
-            window.location.href = '/archive';
-        });
-    } else {
-        console.error('Archive button not found'); // Debug log
-    }
+    // if (archiveButton) {
+    //     archiveButton.addEventListener('click', function (e) {
+    //         e.preventDefault();
+    //         console.log('Archive button clicked'); // Debug log
+    //         // Direct navigation to archive page
+    //         window.location.href = '/archive';
+    //     });
+    // } else {
+    //     console.error('Archive button not found'); // Debug log
+    // }
 
     // Add this event listener to refresh tasks when requested
     window.addEventListener('message', function (event) {
@@ -1418,6 +1426,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const themeSwitchIcon = themeSwitch.querySelector('i');
     const themeSwitchText = themeSwitch.querySelector('span');
     const expandedLogo = document.querySelector('.logo.expanded-logo');
+    const collapsedLogo = document.querySelector('.logo.collapsed-logo')
     
     // Get the current theme from localStorage or default to 'light'
     const currentTheme = localStorage.getItem('theme') || 'light';
@@ -1478,8 +1487,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLogo(theme) {
         if (theme === 'dark') {
             expandedLogo.src = '/resource/logo/Inverted.png';
+            collapsedLogo.src = '/resource/logo/sqLogoDark.png'
         } else {
             expandedLogo.src = '/resource/logo/Dark-noBG.png';
+            collapsedLogo.src = '/resource/logo/sqLOGO.png'
         }
     }
 });

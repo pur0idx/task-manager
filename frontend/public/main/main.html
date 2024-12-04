@@ -1,236 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>TaskHub</title>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/main/main.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="../resource/logo/sqLOGO.png">
-</head>
-<body>
-    <div id="loading">
-        Loading...
-    </div>
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Zilla+Slab:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/main/main.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="../resource/logo/sqLOGO.png" />
+  </head>
+  <body>
+    <div id="loading">Loading...</div>
 
-    <div id="app" style="display: none;">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-container">
-                    <img src="/resource/logo/Dark-noBG.png" alt="TaskHub Logo" class="logo expanded-logo">
-                    <img src="/resource/logo/sqLOGO.png" alt="TH" class="logo collapsed-logo">
-                </div>
-                <button class="toggle-sidebar-btn">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-            </div>
-        
-            <div class="sidebar-menu">
-                <button class="menu-item" data-view="tasks">
-                    <i class="fas fa-tasks"></i>
-                    <span class="menu-text">Tasks</span>
-                </button>
-                <button class="menu-item" data-view="organizations">
-                    <i class="fas fa-building"></i>
-                    <span class="menu-text">Organizations</span>
-                </button>
-                <button class="menu-item" onclick="window.location.href='/archive'">
-                    <i class="fas fa-box-archive"></i>
-                    <span class="menu-text">Archive</span>
-                </button>
-            </div>
-        
-            <div class="user-section">
-                <button id="theme-switch" class="theme-switch-btn">
-                    <i class="fas fa-moon"></i>
-                    <span>Dark Mode</span>
-                </button>
-                <div id="user-info">
-                    <i class="fas fa-user"></i>
-                    <span class="user-text"></span>
-                </div>
-                <button class="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span class="menu-text">Logout</span>
-                </button>
-            </div>
+    <div id="app" style="display: none">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <div class="logo-container">
+            <img
+              src="/resource/logo/Dark-noBG.png"
+              alt="TaskHub Logo"
+              class="logo expanded-logo"
+            />
+            <img
+              src="/resource/logo/sqLOGO.png"
+              alt="TH"
+              class="logo collapsed-logo"
+            />
+          </div>
+          <button class="toggle-sidebar-btn">
+            <i class="fas fa-chevron-left"></i>
+          </button>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content" role="main">
-            <div class="content-header">
-                <h1 id="view-title">Tasks</h1>
-                <div class="header-actions">
-                    <button data-action="new-task" class="primary-btn">
-                        <i class="fas fa-plus"></i>
-                        New Task
-                    </button>
-                    <button data-action="new-organization" class="primary-btn">
-                        <i class="fas fa-plus"></i>
-                        New Organization
-                    </button>
-                   
-                </div>
-            </div>
+        <div class="sidebar-menu">
+          <button class="menu-item" data-view="tasks">
+            <i class="fas fa-tasks"></i>
+            <span class="menu-text">Tasks</span>
+          </button>
+          <button class="sub-btn" data-action="new-task">
+            <span> <i class="fas fa-plus"></i> New Task</span>
+          </button>
+          <button class="menu-item" data-view="organizations">
+            <i class="fas fa-building"></i>
+            <span class="menu-text">Organizations</span>
+          </button>
+          <button class="sub-btn" data-action="new-organization">
+            <span><i class="fas fa-plus"></i> New Organization</span>
+          </button>
+          <button class="menu-item" onclick="window.location.href='/archive'">
+            <i class="fas fa-box-archive"></i>
+            <span class="menu-text">Archive</span>
+          </button>
+        </div>
 
-            <!-- Tasks View -->
-            <div id="tasks-view" class="view">
-                <div class="filters">
-                    <!-- <div class="search-bar">
+        <div class="user-section">
+          <div id="user-info">
+            <i class="fas fa-user"></i>
+            <span class="user-text"></span>
+          </div>
+        </div>
+        <div class="sidebar-menu-footer">
+          <button id="theme-switch" class="theme-switch-btn">
+            <i class="fas fa-moon"></i>
+            <span class="menu-text">Dark Mode</span>
+          </button>
+          <button class="logout-btn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span class="menu-text">Logout</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content" role="main">
+        <div class="content-header">
+          <h1 id="view-title">Tasks</h1>
+          <div class="header-actions">
+            <button data-action="new-task-2" class="primary-btn">
+              <i class="fas fa-plus"></i>
+              New Task
+            </button>
+            <button data-action="new-organization-2" class="primary-btn">
+              <i class="fas fa-plus"></i>
+              New Organization
+            </button>
+          </div>
+        </div>
+
+        <!-- Tasks View -->
+        <div id="tasks-view" class="view">
+          <div class="filters">
+            <!-- <div class="search-bar">
                         <i class="fas fa-search"></i>
                         <input type="text" placeholder="Search tasks...">
                     </div> -->
-                    <div class="search-bar">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Search tasks by title, description, tags, or organization..." class="search-input">
-                        <span id="search-results-count" class="search-results-count"></span>
-                    </div>
-                    <div class="filter-options">
-                        <select name="org-filter">
-                            <option value="">All Organizations</option>
-                        </select>
-                        <select id="tag-filter" name="tag-filter">
-                            <option value="">All Tags</option>
-                        </select>
-                        <select name="status" class = "filter-select">
-                            <option value="all">All Status</option>
-                            <option value="to do">To Do</option>
-                            <option value="in progress">In Progress</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                        <select name="sort-by">
-                            <option value="none">Sort by Due Date</option>
-                            <option value="asc">Earliest First</option>
-                            <option value="desc">Latest First</option>
-                        </select>
-                    </div>
-                    <div class="search-results">
-                        <span id="search-results-count"></span>
-                    </div>
-                </div>
-
-                <div id="tasks-container" class="tasks-grid">
-                    <!-- Tasks will be rendered here -->
-                </div>
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input
+                type="text"
+                placeholder="Search tasks by title, description, tags, or organization..."
+                class="search-input"
+              />
+              <span
+                id="search-results-count"
+                class="search-results-count"
+              ></span>
             </div>
-
-            <!-- Organizations View -->
-            <div id="organizations-view" class="view" style="display: none;">
-                <!-- <div class="search-bar">
-                    <input type="text" class="org-search-input" placeholder="Search organizations...">
-                    
-                
-                  
-                </div>
-                 -->
-                <div id="organizations-container" class="org-grid">
-                    <!-- Organizations will be rendered here -->
-                </div>
+            <div class="filter-options">
+              <select name="org-filter">
+                <option value="">All Organizations</option>
+              </select>
+              <select id="tag-filter" name="tag-filter">
+                <option value="">All Tags</option>
+              </select>
+              <select name="status" class="filter-select">
+                <option value="all">All Status</option>
+                <option value="to do">To Do</option>
+                <option value="in progress">In Progress</option>
+                <option value="completed">Completed</option>
+              </select>
+              <select name="sort-by">
+                <option value="none">Sort by Due Date</option>
+                <option value="asc">Earliest First</option>
+                <option value="desc">Latest First</option>
+              </select>
             </div>
-
-            <!-- Trash View -->
-            <div id="trash-view" class="view" style="display: none;">
-                <div class="trash-container">
-                    <div class="trash-section">
-                        <h3>Deleted Tasks</h3>
-                        <div id="deleted-tasks-container"></div>
-                    </div>
-                    <div class="trash-section">
-                        <h3>Deleted Organizations</h3>
-                        <div id="deleted-organizations-container"></div>
-                    </div>
-                </div>
+            <div class="search-results">
+              <span id="search-results-count"></span>
             </div>
+          </div>
+
+          <div id="tasks-container" class="tasks-grid">
+            <!-- Tasks will be rendered here -->
+          </div>
         </div>
+
+        <!-- Organizations View -->
+        <div id="organizations-view" class="view" style="display: none">
+          <div id="organizations-container" class="org-grid">
+            <!-- Organizations will be rendered here -->
+          </div>
+        </div>
+
+        <!-- Trash View -->
+        <div id="trash-view" class="view" style="display: none">
+          <div class="trash-container">
+            <div class="trash-section">
+              <h3>Deleted Tasks</h3>
+              <div id="deleted-tasks-container"></div>
+            </div>
+            <div class="trash-section">
+              <h3>Deleted Organizations</h3>
+              <div id="deleted-organizations-container"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Add Task Modal -->
     <div id="add-task-modal" class="modal">
-        <div class="modal-content">
-            <h2>Add New Task</h2>
-            <form>
-                <div class="form-group">
-                    <label for="task-title">Title</label>
-                    <input type="text" id="task-title" name="title" required>
-                </div>
+      <div class="modal-content">
+        <h2>Add New Task</h2>
+        <form>
+          <div class="form-group">
+            <label for="task-title">Title</label>
+            <input type="text" id="task-title" name="title" required />
+          </div>
 
-                <div class="form-group">
-                    <label for="task-description">Description</label>
-                    <textarea id="task-description" name="description" rows="3"></textarea>
-                </div>
+          <div class="form-group">
+            <label for="task-description">Description</label>
+            <textarea
+              id="task-description"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="task-due-date">Due Date</label>
-                        <input type="date" id="task-due-date" name="dueDate">
-                    </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="task-due-date">Due Date</label>
+              <input type="date" id="task-due-date" name="dueDate" />
+            </div>
 
-                    <div class="form-group">
-                        <label for="task-organization">Organization</label>
-                        <select id="task-organization" name="organization">
-                            <option value="">Select Organization</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-group">
+              <label for="task-organization">Organization</label>
+              <select id="task-organization" name="organization">
+                <option value="">Select Organization</option>
+              </select>
+            </div>
+          </div>
 
-                <div class="form-group">
-                    <label for="task-tags">Tags (comma-separated)</label>
-                    <input type="text" id="task-tags" name="tags" placeholder="e.g., urgent, meeting, project">
-                </div>
+          <div class="form-group">
+            <label for="task-tags">Tags (comma-separated)</label>
+            <input
+              type="text"
+              id="task-tags"
+              name="tags"
+              placeholder="e.g., urgent, meeting, project"
+            />
+          </div>
 
-                <div class="form-group">
-                    <label for="task-status">Status</label>
-                    <select id="task-status" name="status">
-                        <option value="To Do">To Do</option>
-                        <option value="In Progress">In Progress</option>
-                        <option value="Completed">Completed</option>
-                    </select>
-                </div>
+          <div class="form-group">
+            <label for="task-status">Status</label>
+            <select id="task-status" name="status">
+              <option value="To Do">To Do</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Completed">Completed</option>
+            </select>
+          </div>
 
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn secondary-btn">Cancel</button>
-                    <button type="submit" class="primary-btn">Create Task</button>
-                </div>
-            </form>
-        </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn secondary-btn">
+              Cancel
+            </button>
+            <button type="submit" class="primary-btn">Create Task</button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <!-- Add Organization Modal -->
     <div id="add-org-modal" class="modal">
-        <div class="modal-content">
-            <h2>Add New Organization</h2>
-            <form>
-                <div class="form-group">
-                    <label for="org-name">Organization Name</label>
-                    <input type="text" id="org-name" name="name" required>
-                </div>
+      <div class="modal-content">
+        <h2>Add New Organization</h2>
+        <form>
+          <div class="form-group">
+            <label for="org-name">Organization Name</label>
+            <input type="text" id="org-name" name="name" required />
+          </div>
 
-                <div class="form-group">
-                    <label for="org-description">Description</label>
-                    <textarea id="org-description" name="description" rows="3"></textarea>
-                </div>
+          <div class="form-group">
+            <label for="org-description">Description</label>
+            <textarea
+              id="org-description"
+              name="description"
+              rows="3"
+            ></textarea>
+          </div>
 
-                <div class="form-group">
-                    <label for="org-members">Members (Email addresses, comma-separated)</label>
-                    <input type="text" id="org-members" name="members" placeholder="e.g., user1@example.com, user2@example.com">
-                </div>
+          <div class="form-group">
+            <label for="org-members"
+              >Members (Email addresses, comma-separated)</label
+            >
+            <input
+              type="text"
+              id="org-members"
+              name="members"
+              placeholder="e.g., user1@example.com, user2@example.com"
+            />
+          </div>
 
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn secondary-btn">Cancel</button>
-                    <button type="submit" class="primary-btn">Create Organization</button>
-                </div>
-            </form>
-        </div>
+          <div class="form-actions">
+            <button type="button" class="cancel-btn secondary-btn">
+              Cancel
+            </button>
+            <button type="submit" class="primary-btn">
+              Create Organization
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
 
     <div id="notification-container"></div>
 
     <script src="/main/main.js"></script>
-</body>
+  </body>
 </html>
-
-
-

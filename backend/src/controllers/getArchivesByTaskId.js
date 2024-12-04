@@ -14,12 +14,12 @@ const getArchivesByTaskId = async (req, res) => {
     }
 
     // Check if user owns the task
-    if (task.createdBy.toString() !== req.user.id) {
-      return res.status(403).json({
-        success: false,
-        message: "Not authorized to archive this task",
-      });
-    }
+    // if (task.createdBy.toString() !== req.user.id) {
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "Not authorized to archive this task",
+    //   });
+    // }
 
     // Update the task to archived status
     const updatedTask = await Task.findByIdAndUpdate(
