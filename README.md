@@ -5,6 +5,8 @@
 # TaskHub
 A collaborative task management platform that helps you organize personal tasks and coordinate shared activities with friends and teams.
 
+![screenshot](screenshot.png)
+
 ## About
 This project was developed as part of the final project for the 2110221 Computer Engineering Essential course at Computer Engineering, Chulalongkorn University.
 
